@@ -1,6 +1,11 @@
 {
   "name": "root",
   "private": true,
+  "scripts": {
+    "setup": "npx lerna bootstrap",
+    "test": "npx lerna run test",
+    "build": "npx lerna run build"
+  },
   "devDependencies": {
     "lerna": "^4.0.0"
   }
