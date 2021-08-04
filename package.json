@@ -2,9 +2,14 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "link": "npx lerna link",
     "setup": "npx lerna bootstrap",
     "test": "npx lerna run test",
-    "build": "npx lerna run build"
+    "build": "npx lerna run build",
+    "lint": "npx eslint ./packages --ext .json,.js,.ts",
+    "lint:fix": "npx eslint ./packages --ext .json,.js,.ts --fix",
+    "lint:ci": "npx eslint ./packages --ext .json,.js,.ts --format junit --output-file ./reports/eslint.xml"
+
   },
   "devDependencies": {
     "lerna": "^4.0.0"

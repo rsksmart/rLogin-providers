@@ -1,0 +1,8 @@
+{
+  "files": [],
+  "references": [
+      { "path": "rlogin-eip1993-proxy-subprovider" },
+      { "path": "rlogin-ledger-provider" },
+      { "path": "rlogin-trezor-provider" }
+  ]
+}
