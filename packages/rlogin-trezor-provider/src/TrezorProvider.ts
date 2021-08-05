@@ -5,11 +5,12 @@ import BN from 'bn.js'
 import { RLoginEIP1993Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 
 export interface ITrezorProviderOptions {
-  chainId: number;
+  chainId: number | string;
   config?: { addressSearchLimit: number, shouldAskForOnDeviceConfirmation: boolean };
   manifestEmail: string;
   manifestAppUrl: string;
   rpcUrl: string;
+  dPath?: string
 }
 
 export class TrezorProvider extends RLoginEIP1993Provider {
@@ -17,7 +18,7 @@ export class TrezorProvider extends RLoginEIP1993Provider {
   isTrezor = true
 
   constructor (opts: ITrezorProviderOptions) {
-    super(opts.rpcUrl, opts.chainId)
+    super(opts.rpcUrl, opts.chainId, opts.dPath)
     console.log('TrezorProvider constructor!', opts)
     this.#opts = opts
   }

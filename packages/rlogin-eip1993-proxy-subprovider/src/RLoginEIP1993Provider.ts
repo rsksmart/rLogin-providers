@@ -1,33 +1,51 @@
 import HttpProvider from 'ethjs-provider-http'
 import Eth from 'ethjs-query'
 import BN from 'bn.js'
+import {IRLoginEIP1993Provider} from './types'
 
-export abstract class RLoginEIP1993Provider {
-    protected appEthInitialized: boolean = false
-    protected appEthConnected: boolean = false
-    protected chainId: number
-    protected path: string
-    protected provider: any
+export abstract class RLoginEIP1993Provider implements IRLoginEIP1993Provider{
+  protected appEthInitialized: boolean = false
+  protected appEthConnected: boolean = false
+  protected chainId: number
+  protected path: string
+  protected provider: any
 
-    selectedAddress: string | null
+  selectedAddress: string | null
 
-    constructor (rpcUrl: string, chainId: number) {
-      if (!rpcUrl || !chainId) {
-        throw (new Error('chainId and rpcUrl are required in the constructor options.'))
-      }
-      this.chainId = chainId
-      this.provider = new Eth(new HttpProvider(rpcUrl))
-
-      // is the trezor using the Ethereum app or the RSK app:
-      this.path = chainId === 30 ? "44'/137'/0'/0/0" : "m/44'/60'/0'/0/0"
-      this.appEthInitialized = false
-
-      // to be set during connect
-      this.selectedAddress = null
+  constructor (rpcUrl: string, chainId: number | string, dPath?: string) {
+    if (!rpcUrl || !chainId) {
+      throw (new Error('chainId and rpcUrl are required in the constructor options.'))
     }
+    this.chainId = typeof chainId === 'number'? chainId : parseInt(chainId) 
+    this.provider = new Eth(new HttpProvider(rpcUrl))
+
+    // is the trezor using the Ethereum app or the RSK app:
+    this.path = dPath? dPath : this.#getDPath(this.chainId)
+    this.appEthInitialized = false
+
+    // to be set during connect
+    this.selectedAddress = null
+  }
+
+  #getDPath(chainId: number): string {
+    switch(chainId) {
+      //RSK
+      case 30: return "44'/137'/0'/0/0"
+      case 31: 
+      //Ethereum
+      case 1:
+      case 3: 
+      case 4:
+      case 5:
+          return "m/44'/60'/0'/0/0"
+      
+      default:
+          throw new Error('Network not supported please specify the derivation path')
+    }
+  }
 
   // If connect is successful it should set appEthInitialized and appEthConnected to true
-  abstract connect(): Promise<any>;
+  abstract connect(): Promise<IRLoginEIP1993Provider>;
   abstract ethSendTransaction(to:string, value:number|string, data: string):Promise<string>;
   abstract personalSign(message:string):Promise<string>;
 
@@ -40,10 +58,12 @@ export abstract class RLoginEIP1993Provider {
     console.log('🦄 incoming request:', method, params)
 
     switch (method) {
-      case 'eth_accounts': return [this.selectedAddress]
+      case 'eth_accounts':
+      case 'eth_requestAccounts':
+         return [this.selectedAddress]
       case 'eth_chainId':
       case 'net_version':
-        return this.chainId
+        return this.chainId.toString(16)
       case 'eth_getBalance':
         return this.provider.getBalance(this.selectedAddress).then((response:any) => response.toString('hex'))
       case 'eth_getTransactionReceipt':

@@ -11,8 +11,8 @@ export class LedgerProvider extends RLoginEIP1993Provider {
   selectedAddress: string | null
   isLedger = true
 
-  constructor (opts: { chainId: number; rpcUrl: string, debug?: boolean }) {
-    super(opts.rpcUrl, opts.chainId)
+  constructor (opts: { chainId: number | string; rpcUrl: string, dPath?:string, debug?: boolean }) {
+    super(opts.rpcUrl, opts.chainId, opts.dPath)
     this.#debug = opts.debug || false
     // to be set during connect
     this.#appEth = null
@@ -47,7 +47,7 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    * Connect to the Ledger physical device
    * @returns Ledger EIP1193 Provider Wrapper
    */
-  connect () {
+  connect ():Promise<any> {
     this.#logger('🦄 attempting to connect!')
     return new Promise((resolve, reject) => {
       TransportWebUSB.create()
