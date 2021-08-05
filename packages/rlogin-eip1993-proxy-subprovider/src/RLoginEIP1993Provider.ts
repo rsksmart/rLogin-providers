@@ -66,7 +66,13 @@ export abstract class RLoginEIP1993Provider {
           data: params[0].data || '0x0'
         }).then((estimate: BN) => estimate.toNumber())
 
-      default: return this.provider.sendAsync(request)
+      default:
+        return new Promise((resolve, reject) => {
+          this.provider.sendAsync(request, (err, data) => {
+          if (err) return reject(err)
+          resolve(data)
+        })
+      })
     }
   }
 
