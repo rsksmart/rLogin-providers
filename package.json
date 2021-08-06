@@ -9,7 +9,6 @@
     "lint": "npx eslint ./packages --ext .json,.js,.ts",
     "lint:fix": "npx eslint ./packages --ext .json,.js,.ts --fix",
     "lint:ci": "npx eslint ./packages --ext .json,.js,.ts --format junit --output-file ./reports/eslint.xml"
-
   },
   "devDependencies": {
     "lerna": "^4.0.0"
