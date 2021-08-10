@@ -53,6 +53,7 @@ export class LedgerProvider extends RLoginEIP1993Provider {
       TransportWebUSB.create()
         .then((transport: Transport) => {
           this.#appEth = new AppEth(transport)
+          this.appEthConnected = true
 
           // get the ledger's first address and set it
           this.#appEth.getAddress(this.path)

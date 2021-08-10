@@ -63,7 +63,7 @@ export abstract class RLoginEIP1993Provider implements IRLoginEIP1993Provider{
          return [this.selectedAddress]
       case 'eth_chainId':
       case 'net_version':
-        return this.chainId.toString(16)
+        return `0x${this.chainId.toString(16)}`
       case 'eth_getBalance':
         return this.provider.getBalance(this.selectedAddress).then((response:any) => response.toString('hex'))
       case 'eth_getTransactionReceipt':
