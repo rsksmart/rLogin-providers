@@ -20,7 +20,7 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: "rLoginTrezorProvider",
+    library: "rLoginWeb3ReactProvider",
     umdNamedDefine: true,
     globalObject: "this"
   }
