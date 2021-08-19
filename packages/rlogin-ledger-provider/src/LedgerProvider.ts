@@ -47,7 +47,7 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    * Connect to the Ledger physical device
    * @returns Ledger EIP1193 Provider Wrapper
    */
-  async connect ():Promise<any> {
+  async connect (): Promise<any> {
     this.#logger('🦄 attempting to connect!')
     try {
       const transport: Transport = await TransportWebUSB.create()
