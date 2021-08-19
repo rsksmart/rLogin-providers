@@ -33,7 +33,7 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    * @param reject Reject from the parent's promise
    * @returns returns the rejected promise with more descriptive error
    */
-  #handleLedgerError = (err: Error) => {
+  #decodeLedgerError = (err: Error): string => {
     this.#logger('🦄 try to interperate the error: ', err)
     switch (err.message) {
       case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return 'Unlock the device to connect.'
