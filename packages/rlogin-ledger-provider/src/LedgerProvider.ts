@@ -1,4 +1,4 @@
-import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
+import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
 import { createTransaction, signTransaction, txPartial } from './helpers'
@@ -33,13 +33,13 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    * @param reject Reject from the parent's promise
    * @returns returns the rejected promise with more descriptive error
    */
-  #handleLedgerError = (err: Error, reject: any) => {
+  #handleLedgerError = (err: Error) => {
     this.#logger('🦄 try to interperate the error: ', err)
     switch (err.message) {
-      case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return reject('Unlock the device to connect.')
-      case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return reject('Navigate to the correct app (Ethereum or RSK Mainnet) in the Ledger.')
+      case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return 'Unlock the device to connect.'
+      case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return 'Navigate to the correct app (Ethereum or RSK Mainnet) in the Ledger.'
       // unknown error
-      default: reject(err)
+      default: return err
     }
   }
 
@@ -47,24 +47,18 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    * Connect to the Ledger physical device
    * @returns Ledger EIP1193 Provider Wrapper
    */
-  connect ():Promise<any> {
+  async connect ():Promise<any> {
     this.#logger('🦄 attempting to connect!')
-    return new Promise((resolve, reject) => {
-      TransportWebUSB.create()
-        .then((transport: Transport) => {
-          this.#appEth = new AppEth(transport)
-          this.appEthConnected = true
-
-          // get the ledger's first address and set it
-          this.#appEth.getAddress(this.path)
-            .then((result: { address: string, chainCode?: string, publicKey: string}) => {
-              this.selectedAddress = result.address
-              resolve(this)
-            })
-            .catch((error: Error) => this.#handleLedgerError(error, reject))
-        })
-        .catch((error: Error) => this.#handleLedgerError(error, reject))
-    })
+    try {
+      const transport: Transport = await TransportWebUSB.create()
+      this.#appEth = new AppEth(transport)
+      this.appEthConnected = true
+      const result = await this.#appEth.getAddress(this.path)
+      this.selectedAddress = result.address
+      return this
+    } catch(error) {
+      throw this.#handleLedgerError(error)
+    }
   }
 
   async ethSendTransaction(to:string, value:number|string, data: string): Promise<string> {
