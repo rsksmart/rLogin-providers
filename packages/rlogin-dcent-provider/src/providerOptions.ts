@@ -1,4 +1,4 @@
-import { DCentProvider } from './DCentProvider'
+import { DcentProvider, IDcentProviderOptions } from './DCentProvider'
 
 export const dcentProviderOptions = {
   display: {
@@ -6,10 +6,10 @@ export const dcentProviderOptions = {
     name: 'D\'Cent',
     description: 'Connect your D\'Cent Hardware Wallet'
   },
-  connector: async (ProviderPackage, options) => {
+  connector: async (ProviderPackage, options: IDcentProviderOptions) => {
     const provider = new ProviderPackage(options)
     await provider.connect()
     return provider
   },
-  package: DCentProvider
+  package: DcentProvider
 }

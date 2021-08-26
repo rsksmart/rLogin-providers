@@ -1,2 +1,2 @@
-export { DCentProvider } from './DCentProvider'
+export { DcentProvider } from './DCentProvider'
 export { dcentProviderOptions } from './providerOptions'
