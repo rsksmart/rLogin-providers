@@ -14,6 +14,11 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
+    fallback: {
+      util: require.resolve("util/"),
+      url: require.resolve("url/"),
+      stream: false 
+    }
   },
   output: {
     filename: 'bundle.js',

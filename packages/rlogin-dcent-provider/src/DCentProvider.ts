@@ -1,6 +1,8 @@
 import DcentWebConnector from 'dcent-web-connector'
+import DcentProvider from 'dcent-provider'
+import { createTransaction } from './helpers'
 import { RLoginEIP1993Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-export interface IDcentProviderOptions {
+export interface IRLoginDcentProviderOptions {
   chainId: number | string;
   config?: { addressSearchLimit: number, shouldAskForOnDeviceConfirmation: boolean };
   manifestEmail: string;
@@ -8,13 +10,15 @@ export interface IDcentProviderOptions {
   rpcUrl: string;
   dPath?: string
 }
-export class DcentProvider extends RLoginEIP1993Provider {
-  #opts : IDcentProviderOptions
-  constructor (opts: IDcentProviderOptions) {
+
+export class RLoginDcentProvider extends RLoginEIP1993Provider {
+  #opts : IRLoginDcentProviderOptions
+  constructor (opts: IRLoginDcentProviderOptions) {
     super(opts.rpcUrl, opts.chainId, opts.dPath)
-    console.log('DcentProvider constructor!', opts)
+    console.log('RLoginDcentProvider constructor!', opts)
     this.#opts = opts
   }
+
   /**
    * Attempt to parse an UNKNOWN_ERROR returned from Dcent.
    *
@@ -26,6 +30,12 @@ export class DcentProvider extends RLoginEIP1993Provider {
     console.log(':cara_de_unicornio: try to interpret the error: ', { message, code })
     return code ? `Dcent: ${code} - ${message}` : message
   }
+
+  /**
+   * Connect to the Dcent physical device.
+   * 
+   * @returns Dcent EIP1193 Provider Wrapper
+   */
   async connect (): Promise<any> {
     let result
     if (!this.appEthInitialized) {
@@ -40,7 +50,7 @@ export class DcentProvider extends RLoginEIP1993Provider {
     }
 
     if (!this.appEthConnected) {
-      console.log(':cara_de_unicornio: attempting to connect!**')
+      console.log(':cara_de_unicornio: attempting to connect!')
       result = await DcentWebConnector.getAccountInfo()
 
       try {
@@ -61,6 +71,12 @@ export class DcentProvider extends RLoginEIP1993Provider {
     return this
   }
 
+  /**
+   * Sign personal message with Dcent.
+   * 
+   * @param message 
+   * @returns 
+   */
   async personalSign (message:string) {
     let result
     try {
@@ -73,8 +89,48 @@ export class DcentProvider extends RLoginEIP1993Provider {
       DcentWebConnector.popupWindowClose()
     }
   }
+
+  /**
+   * Create enable and send transaction using Dcent provider.
+   * 
+   * @param to 
+   * @param value 
+   * @param data 
+   * @returns Tx object, signature include.
+   */
   async ethSendTransaction (to:string, value:number|string, data: string): Promise<string> {
-    // TODO: Implement (add helper file if you need it (see trezor example))
-    return undefined
+    if (!this.appEthConnected) {
+      throw new Error('Please connect before sending requests.')
+    }
+
+    const tx = await createTransaction(this.provider, this.selectedAddress!,
+    {
+      to,
+      value,
+      data
+    })
+
+    const my_provider = new DcentProvider({
+      rpcUrl: this.#opts.rpcUrl,
+      chainId: this.chainId
+    })
+
+    const result = await my_provider.enable()
+    
+    const transaction = {
+      from: tx.from,
+      gasPrice: tx.gasPrice,
+      gas: tx.gasLimit,
+      to: tx.to,
+      value: tx.value,
+      data: tx.data
+    }
+
+    try {
+      console.log(':cara_de_unicornio: attempting to send tx!')
+      return await my_provider.send('eth_sendTransaction', transaction)
+    } catch (error) {
+        throw new Error(this.#handleDcentError(error.message, error.code))
+    }
   }
 }

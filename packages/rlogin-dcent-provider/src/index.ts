@@ -1,2 +1,3 @@
-export { DcentProvider } from './DCentProvider'
+export { IRLoginDcentProviderOptions } from './DCentProvider'
+export { RLoginDcentProvider } from './DCentProvider'
 export { dcentProviderOptions } from './providerOptions'
