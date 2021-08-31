@@ -1,3 +1,4 @@
+import TransportWebHID from "@ledgerhq/hw-transport-webhid";
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
@@ -49,8 +50,13 @@ export class LedgerProvider extends RLoginEIP1193Provider {
    */
   async connect (): Promise<any> {
     this.#logger('🦄 attempting to connect!')
+    let transport: Transport
     try {
-      const transport: Transport = await TransportWebUSB.create()
+      transport = await TransportWebHID.create()
+    } catch(e){
+      transport = await TransportWebUSB.create()
+    }
+    try{
       this.#appEth = new AppEth(transport)
       this.appEthConnected = true
       const result = await this.#appEth.getAddress(this.path)
@@ -78,5 +84,10 @@ export class LedgerProvider extends RLoginEIP1193Provider {
       v2 = '0' + v
     }
     return `0x${result.r}${result.s}${v2}`
+  }
+  async disconnect(){
+    console.log('disconnecting...')
+    this.#appEth.transport.close()
+    console.log('disconnected')
   }
 }
