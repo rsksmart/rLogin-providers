@@ -2,9 +2,9 @@ import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
 import { createTransaction, signTransaction, txPartial } from './helpers'
-import { RLoginEIP1993Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+import { RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 
-export class LedgerProvider extends RLoginEIP1993Provider {
+export class LedgerProvider extends RLoginEIP1193Provider {
   #appEth: AppEth | null
   #debug: boolean
 
@@ -33,13 +33,13 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    * @param reject Reject from the parent's promise
    * @returns returns the rejected promise with more descriptive error
    */
-  #decodeLedgerError = (err: Error): string => {
+  #handleLedgerError = (err: Error): string => {
     this.#logger('🦄 try to interperate the error: ', err)
     switch (err.message) {
       case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return 'Unlock the device to connect.'
       case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return 'Navigate to the correct app (Ethereum or RSK Mainnet) in the Ledger.'
       // unknown error
-      default: return err
+      default: return err.message
     }
   }
 

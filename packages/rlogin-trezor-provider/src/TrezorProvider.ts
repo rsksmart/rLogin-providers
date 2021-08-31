@@ -2,7 +2,7 @@ import TrezorConnect from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
 import { createTransaction } from './helpers'
 import BN from 'bn.js'
-import { RLoginEIP1993Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+import { RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 
 export interface ITrezorProviderOptions {
   chainId: number | string;
@@ -13,7 +13,7 @@ export interface ITrezorProviderOptions {
   dPath?: string
 }
 
-export class TrezorProvider extends RLoginEIP1993Provider {
+export class TrezorProvider extends RLoginEIP1193Provider {
   #opts : ITrezorProviderOptions
   isTrezor = true
 
