@@ -70,11 +70,9 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   async ethSendTransaction(to:string, value:number|string, data: string): Promise<string> {
     const transaction: txPartial = await createTransaction(this.provider, this.selectedAddress,{ to, from: this.selectedAddress, value, data })
     const serializedTx: string =  await signTransaction(transaction, this.#appEth, this.path, this.chainId)
-    return new Promise((resolve,reject)=> this.provider.sendRawTransaction(`0x${serializedTx}`, (sendError: Error, transactionHash: string) =>
-          sendError ? reject(sendError) : resolve(transactionHash))
-      .catch((error: Error) => reject(error)))
+    return await this.provider.sendRawTransaction(`0x${serializedTx}`)
   }
-
+  
   // reference: https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth#signpersonalmessage
   async personalSign(message:string):Promise<string> {
     const result = await this.#appEth.signPersonalMessage(this.path, Buffer.from(message).toString('hex'))
