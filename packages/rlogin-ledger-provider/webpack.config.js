@@ -22,7 +22,8 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    })
+    }),
+    new webpack.DefinePlugin({process: {env: { DEBUG: false }}})
   ],
   output: {
     filename: 'bundle.js',
