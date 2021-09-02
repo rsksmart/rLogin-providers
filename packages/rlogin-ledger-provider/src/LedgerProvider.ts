@@ -1,10 +1,11 @@
+import TransportWebHID from "@ledgerhq/hw-transport-webhid";
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
 import { createTransaction, signTransaction, txPartial } from './helpers'
-import { RLoginEIP1993Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+import { RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 
-export class LedgerProvider extends RLoginEIP1993Provider {
+export class LedgerProvider extends RLoginEIP1193Provider {
   #appEth: AppEth | null
   #debug: boolean
 
@@ -33,13 +34,13 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    * @param reject Reject from the parent's promise
    * @returns returns the rejected promise with more descriptive error
    */
-  #decodeLedgerError = (err: Error): string => {
+  #handleLedgerError = (err: Error): string => {
     this.#logger('🦄 try to interperate the error: ', err)
     switch (err.message) {
       case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return 'Unlock the device to connect.'
       case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return 'Navigate to the correct app (Ethereum or RSK Mainnet) in the Ledger.'
       // unknown error
-      default: return err
+      default: return err.message
     }
   }
 
@@ -49,8 +50,13 @@ export class LedgerProvider extends RLoginEIP1993Provider {
    */
   async connect (): Promise<any> {
     this.#logger('🦄 attempting to connect!')
+    let transport: Transport
     try {
-      const transport: Transport = await TransportWebUSB.create()
+      transport = await TransportWebHID.create()
+    } catch(e){
+      transport = await TransportWebUSB.create()
+    }
+    try{
       this.#appEth = new AppEth(transport)
       this.appEthConnected = true
       const result = await this.#appEth.getAddress(this.path)
@@ -64,11 +70,9 @@ export class LedgerProvider extends RLoginEIP1993Provider {
   async ethSendTransaction(to:string, value:number|string, data: string): Promise<string> {
     const transaction: txPartial = await createTransaction(this.provider, this.selectedAddress,{ to, from: this.selectedAddress, value, data })
     const serializedTx: string =  await signTransaction(transaction, this.#appEth, this.path, this.chainId)
-    return new Promise((resolve,reject)=> this.provider.sendRawTransaction(`0x${serializedTx}`, (sendError: Error, transactionHash: string) =>
-          sendError ? reject(sendError) : resolve(transactionHash))
-      .catch((error: Error) => reject(error)))
+    return await this.provider.sendRawTransaction(`0x${serializedTx}`)
   }
-
+  
   // reference: https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth#signpersonalmessage
   async personalSign(message:string):Promise<string> {
     const result = await this.#appEth.signPersonalMessage(this.path, Buffer.from(message).toString('hex'))
@@ -78,5 +82,8 @@ export class LedgerProvider extends RLoginEIP1993Provider {
       v2 = '0' + v
     }
     return `0x${result.r}${result.s}${v2}`
+  }
+  async disconnect(){
+    this.#appEth.transport.close()
   }
 }

@@ -3,7 +3,7 @@
 </p>
 <h3 align="middle">rLogin providers</h3>
 <p align="middle">
-    A set of EIP-1993 providers for rLogin
+    A set of EIP-1193 providers for rLogin
 </p>
 
 This libraries are a set of wrappers that are used by [`@rsksmart/rLogin`](https://github.com/rsksmart/rLogin) that make all integrated web3 providers compatible, complaint with [EIP-1193 - Ethereum Provider JavaScript API](https://eips.ethereum.org/EIPS/eip-1193).

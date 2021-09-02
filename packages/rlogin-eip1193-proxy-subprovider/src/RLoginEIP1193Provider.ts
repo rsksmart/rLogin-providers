@@ -1,9 +1,9 @@
 import HttpProvider from 'ethjs-provider-http'
 import Eth from 'ethjs-query'
 import BN from 'bn.js'
-import {IRLoginEIP1993Provider} from './types'
+import {IRLoginEIP1193Provider} from './types'
 
-export abstract class RLoginEIP1993Provider implements IRLoginEIP1993Provider{
+export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider{
   protected appEthInitialized: boolean = false
   protected appEthConnected: boolean = false
   protected chainId: number
@@ -45,7 +45,7 @@ export abstract class RLoginEIP1993Provider implements IRLoginEIP1993Provider{
   }
 
   // If connect is successful it should set appEthInitialized and appEthConnected to true
-  abstract connect(): Promise<IRLoginEIP1993Provider>;
+  abstract connect(): Promise<IRLoginEIP1193Provider>;
   abstract ethSendTransaction(to:string, value:number|string, data: string):Promise<string>;
   abstract personalSign(message:string):Promise<string>;
 
