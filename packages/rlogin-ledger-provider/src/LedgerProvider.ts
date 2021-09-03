@@ -84,6 +84,9 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     return `0x${result.r}${result.s}${v2}`
   }
   async disconnect(){
+    this.#appEth = null
+    this.selectedAddress = null
+    this.appEthConnected = false
     this.#appEth.transport.close()
   }
 }
