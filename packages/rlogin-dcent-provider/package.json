@@ -1,7 +1,7 @@
 {
   "name": "@rsksmart/rlogin-dcent-provider",
   "version": "1.0.0-beta.3",
-  "description": "rLogin - Ledger EIP-1193 provider",
+  "description": "rLogin - D'cent EIP-1193 provider",
   "main": "dist/bundle.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -28,15 +28,10 @@
   },
   "homepage": "https://github.com/rsksmart/rLogin-providers#readme",
   "dependencies": {
-    "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.1",
-    "@walletconnect/web3-provider": "^1.5.2",
     "dcent-provider": "^0.3.0-beta",
     "dcent-web-connector": "^0.10.4",
-    "env-cmd": "^10.1.0",
     "url": "^0.11.0",
-    "util": "^0.12.4",
-    "web3": "^1.5.0",
-    "web3-utils": "^1.5.0"
+    "util": "^0.12.4"
   },
   "devDependencies": {
     "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.2",

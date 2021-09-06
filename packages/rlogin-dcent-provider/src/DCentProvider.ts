@@ -13,11 +13,21 @@ export interface IRLoginDcentProviderOptions {
 
 export class RLoginDcentProvider extends RLoginEIP1993Provider {
   #opts : IRLoginDcentProviderOptions
+  #debug: boolean
+
   constructor (opts: IRLoginDcentProviderOptions) {
     super(opts.rpcUrl, opts.chainId, opts.dPath)
-    console.log('RLoginDcentProvider constructor!', opts)
+    this.#logger('RLoginDcentProvider constructor!', opts)
     this.#opts = opts
   }
+
+  /**
+   * Simple logger
+   * 
+   * @param params any
+   * @returns null
+   */
+  #logger = (...params: any) => this.#debug && console.log(...params)
 
   /**
    * Attempt to parse an UNKNOWN_ERROR returned from Dcent.
@@ -27,7 +37,7 @@ export class RLoginDcentProvider extends RLoginEIP1993Provider {
    * @returns returns the rejected promise
    */
   #handleDcentError = (message: string, code?: string): string => {
-    console.log(':cara_de_unicornio: try to interpret the error: ', { message, code })
+    this.#logger('🦄 try to interpret the error: ', { message, code })
     return code ? `Dcent: ${code} - ${message}` : message
   }
 
@@ -37,38 +47,36 @@ export class RLoginDcentProvider extends RLoginEIP1993Provider {
    * @returns Dcent EIP1193 Provider Wrapper
    */
   async connect (): Promise<any> {
-    let result
-    if (!this.appEthInitialized) {
-      console.log(':cara_de_unicornio: attempting to initialize!')
-      try {
+    try {
+      let result
+      if (!this.appEthInitialized) {
+        this.#logger('🦄 attempting to initialize!')
+      
         result = await DcentWebConnector.getDeviceInfo()
-        console.log({ result })
+        this.#logger({ result })
         this.appEthInitialized = true
-      } catch (e) {
-        throw new Error(this.#handleDcentError(e.message))
-      }
-    }
-
-    if (!this.appEthConnected) {
-      console.log(':cara_de_unicornio: attempting to connect!')
-      result = await DcentWebConnector.getAccountInfo()
-
-      try {
-        var coinType = DcentWebConnector.coinType.ETHEREUM
-        result = await DcentWebConnector.getAddress(coinType, this.path)
-      } catch (e) {
-        throw new Error(this.#handleDcentError(e.message))
       }
       
-      if (result.header.status === 'success') {
-        this.appEthConnected = true
-        this.selectedAddress = result.body.parameter.address
-        DcentWebConnector.popupWindowClose()
-      } else {
-        throw new Error(this.#handleDcentError(result.payload.error, result.payload.code))
+      if (!this.appEthConnected) {
+        this.#logger('🦄 attempting to connect!')
+        result = await DcentWebConnector.getAccountInfo()
+
+        var coinType = DcentWebConnector.coinType.ETHEREUM
+        result = await DcentWebConnector.getAddress(coinType, this.path)
+
+        if (result.header.status === 'success') {
+          this.appEthConnected = true
+          this.selectedAddress = result.body.parameter.address
+          DcentWebConnector.popupWindowClose()
+        } else {
+          this.#handleDcentError(result.payload.error, result.payload.code)
+        }
       }
+      
+      return this
+    } catch (e) {
+      this.#handleDcentError(e.message)
     }
-    return this
   }
 
   /**
@@ -81,10 +89,10 @@ export class RLoginDcentProvider extends RLoginEIP1993Provider {
     let result
     try {
       result = await DcentWebConnector.getEthereumSignedMessage(message, this.path)
-      console.log({ result })
+      this.#logger({ result })
       return result.body.parameter.sign
     } catch (error) {
-      throw new Error(this.#handleDcentError(result.payload.error, result.payload.code))
+      this.#handleDcentError(result.payload.error, result.payload.code)
     } finally {
       DcentWebConnector.popupWindowClose()
     }
@@ -127,10 +135,10 @@ export class RLoginDcentProvider extends RLoginEIP1993Provider {
     }
 
     try {
-      console.log(':cara_de_unicornio: attempting to send tx!')
+      this.#logger('🦄 attempting to send tx!')
       return await my_provider.send('eth_sendTransaction', transaction)
     } catch (error) {
-        throw new Error(this.#handleDcentError(error.message, error.code))
+      this.#handleDcentError(error.message, error.code)
     }
   }
 }
