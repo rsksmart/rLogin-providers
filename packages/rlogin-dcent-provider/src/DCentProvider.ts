@@ -14,6 +14,7 @@ export interface IRLoginDcentProviderOptions {
 export class RLoginDcentProvider extends RLoginEIP1193Provider {
   #opts : IRLoginDcentProviderOptions
   #debug: boolean
+  isDcent = true
 
   constructor (opts: IRLoginDcentProviderOptions) {
     super(opts.rpcUrl, opts.chainId, opts.dPath)
