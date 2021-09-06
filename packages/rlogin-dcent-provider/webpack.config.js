@@ -17,6 +17,7 @@ module.exports = {
     fallback: {
       util: require.resolve("util/"),
       url: require.resolve("url/"),
+      buffer: require.resolve("buffer/"),
       stream: false 
     }
   },

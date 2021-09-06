@@ -1,7 +1,7 @@
 import DcentWebConnector from 'dcent-web-connector'
 import DcentProvider from 'dcent-provider'
 import { createTransaction } from './helpers'
-import { RLoginEIP1993Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+import { RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 export interface IRLoginDcentProviderOptions {
   chainId: number | string;
   config?: { addressSearchLimit: number, shouldAskForOnDeviceConfirmation: boolean };
@@ -11,7 +11,7 @@ export interface IRLoginDcentProviderOptions {
   dPath?: string
 }
 
-export class RLoginDcentProvider extends RLoginEIP1993Provider {
+export class RLoginDcentProvider extends RLoginEIP1193Provider {
   #opts : IRLoginDcentProviderOptions
   #debug: boolean
 
