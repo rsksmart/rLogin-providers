@@ -1,7 +1,10 @@
 import DcentWebConnector from 'dcent-web-connector'
 import DcentProvider from 'dcent-provider'
-import { createTransaction } from './helpers'
-import { RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+import { RLoginEIP1193Provider, createTransaction, tx } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+export interface txPartialDcent extends tx {
+  coinType: string
+}
+
 export interface IRLoginDcentProviderOptions {
   chainId: number | string;
   config?: { addressSearchLimit: number, shouldAskForOnDeviceConfirmation: boolean };

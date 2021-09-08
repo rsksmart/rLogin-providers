@@ -2,9 +2,11 @@ import TransportWebHID from "@ledgerhq/hw-transport-webhid";
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
-import { createTransaction, signTransaction, txPartial } from './helpers'
-import { RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-
+import { signTransaction } from './helpers'
+import { RLoginEIP1193Provider, createTransaction, tx } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+export interface txPartialLedger extends tx {
+  from: string
+}
 export class LedgerProvider extends RLoginEIP1193Provider {
   #appEth: AppEth | null
   #debug: boolean
@@ -68,7 +70,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   }
 
   async ethSendTransaction(to:string, value:number|string, data: string): Promise<string> {
-    const transaction: txPartial = await createTransaction(this.provider, this.selectedAddress,{ to, from: this.selectedAddress, value, data })
+    const transaction: txPartialLedger = await createTransaction(this.provider, this.selectedAddress,{ to, from: this.selectedAddress, value, data })
     const serializedTx: string =  await signTransaction(transaction, this.#appEth, this.path, this.chainId)
     return await this.provider.sendRawTransaction(`0x${serializedTx}`)
   }

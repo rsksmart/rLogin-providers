@@ -17,3 +17,12 @@ export interface IRLoginEIP1193Provider {
     on(method: string): void;
     removeAllListeners(): void;
 }
+export interface tx {
+  to: string,
+  value: number,
+  data: string,
+  nonce?: number,
+  gasPrice: number,
+  gasLimit: number,
+}
+  
