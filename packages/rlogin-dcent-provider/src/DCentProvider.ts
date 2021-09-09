@@ -8,8 +8,6 @@ export interface txPartialDcent extends tx {
 export interface IRLoginDcentProviderOptions {
   chainId: number | string;
   config?: { addressSearchLimit: number, shouldAskForOnDeviceConfirmation: boolean };
-  manifestEmail: string;
-  manifestAppUrl: string;
   rpcUrl: string;
   dPath?: string
 }
