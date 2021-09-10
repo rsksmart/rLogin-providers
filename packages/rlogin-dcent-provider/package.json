@@ -1,57 +1,44 @@
 {
-  "name": "@rsksmart/rlogin-dcent-provider",
-  "version": "1.0.0-beta.3",
-  "description": "rLogin - D'cent EIP-1193 provider",
-  "main": "dist/bundle.js",
-  "types": "lib/index.d.ts",
-  "files": [
-    "lib/"
-  ],
+	"name": "@rsksmart/rlogin-dcent-provider",
+	"version": "1.0.0-beta.3",
+	"description": "rLogin - D'cent EIP-1193 provider",
+	"main": "dist/bundle.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist/"
+	],
   "scripts": {
     "build": "webpack"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rsksmart/rLogin-providers.git"
-  },
-  "keywords": [
-    "rsk",
-    "rif",
-    "eth",
-    "eip1193",
-    "web3"
-  ],
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/rsksmart/rLogin-providers/issues"
-  },
-  "homepage": "https://github.com/rsksmart/rLogin-providers#readme",
-  "dependencies": {
-    "assert": "^2.0.0",
-    "buffer": "^6.0.3",
-    "dcent-provider": "^0.3.0-beta",
-    "dcent-web-connector": "^0.10.4",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rsksmart/rLogin-providers.git"
+	},
+	"keywords": [
+		"rsk",
+		"rif",
+		"eth",
+		"eip1193",
+		"web3"
+	],
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/rsksmart/rLogin-providers/issues"
+	},
+	"homepage": "https://github.com/rsksmart/rLogin-providers#readme",
+	"dependencies": {
+    "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.5",
+    "@rsksmart/rlogin-transactions": "^1.0.0-beta.5",
+    "@rsksmart/rlogin-dpath": "^1.0.0-beta.5",
+		"assert": "^2.0.0",
+		"buffer": "^6.0.3",
+		"dcent-provider": "^0.3.0-beta",
     "url": "^0.11.0",
-    "util": "^0.12.4"
+    "util": "^0.12.4",
+		"stream-browserify": "^3.0.0"
   },
   "devDependencies": {
-    "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.2",
-    "@types/bn.js": "^5.1.0",
-    "@types/jest": "^26.0.23",
-    "@typescript-eslint/eslint-plugin": "^4.23.0",
-    "@typescript-eslint/parser": "^4.23.0",
-    "eslint": "^7.26.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^24.3.6",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "jest": "^26.6.3",
-    "ts-jest": "^26.5.6",
-    "ts-loader": "^9.1.2",
-    "typescript": "^4.2.4",
-    "webpack": "^5.45.1",
-    "webpack-cli": "^4.7.2"
-  }
+    "@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.5"
+	}
 }

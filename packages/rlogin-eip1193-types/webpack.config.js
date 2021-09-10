@@ -1,5 +1,4 @@
 const path = require('path')
-const webpack = require('webpack')
 
 module.exports = {
   mode: 'production',
@@ -17,11 +16,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js']
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer']
-    })
-  ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),

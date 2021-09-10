@@ -1,6 +1,8 @@
 const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
+  mode: 'production',
   entry: './src/index.ts',
   devtool: 'source-map',
   module: {
@@ -15,13 +17,17 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     fallback: {
-      util: require.resolve("util/"),
+      assert: require.resolve("assert"),
+      stream: require.resolve("stream-browserify"),
       url: require.resolve("url/"),
-      buffer: require.resolve("buffer/"),
-      assert: require.resolve("assert/"),
-      stream: false 
+      util: require.resolve("util/")
     }
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
+    })
+  ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
