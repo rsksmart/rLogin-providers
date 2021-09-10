@@ -51,8 +51,6 @@ const rLogin = new RLogin({
       'custom-dcent': {
       ...dcentProviderOptions,
       options: {
-        manifestEmail: 'info@iovlabs.org',
-        manifestAppUrl: 'https://basic-sample.rlogin.identity.rifos.org/',
         rpcUrl: 'https://public-node.testnet.rsk.co',
         chainId: 31,
         debug: true
@@ -61,16 +59,38 @@ const rLogin = new RLogin({
   supportedChains: [30, 31]
 })
 ```
+## Security advice
+
+Protect your cold wallet with your finger print/pin. Do the same for your app.
+
+## Setup
+
+After you secure your wallet, you need to create an account to do transactions. You can do this from your cold wallet or from your App.
+
+## Firmware update
+
+We strongly recommend update your cold wallet firmware to the latest version.
+
+## App or software walllet
+
+Android and Iphone supported.
+D'cent have an app for manage accounts and networks: https://dcentwallet.com/MobileApp
+For testnet you need to go to "Setting" and enable testnet support. After that go to "Discovery" and find the "Network" option to change the network.
+
+## Pair your wallet
+
+App needed. Remember turn on the "Bluetooth" from your cellphone for pair the D'cent wallet. Now you can press the "Bluetooth red icon" in the "Account" option for list your cold wallets in range and be paired.
+You will see a blue led dot in the right corner of your cold wallet if you succeed.
+
+## Docs
+
+You can check the official documentation here: https://userguide.dcentwallet.com/
 
 ### Implementation notes
 
 - Similar to the Portis connector, you can only specify a single chainId to connect to.
 - The `custom-` needs to be connection data and provider configuration. The `...dcentProviderOptions` contains the D'cent text and image and connects rLogin to the provider.
-- D'cent has two apps that work with RSK:
-  - The RSK App will only work with RSK Mainnet as it uses the correct derivation path of `44'/137'/0'/0/0`
-  - To use RSK Testnet, you must use the Ethereum App on the Ledger. It will use the standard Ethereum derivation path of `44'/60'/0'/0/0`. As of writing, no Ledger app will accept the RSK Testnet derivation path.
 - pass `debug: true` for console logs that may help you debug.
-
 
 ## Run for development
 
