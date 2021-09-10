@@ -1,3 +1,2 @@
-export type { ITrezorProviderOptions } from './TrezorProvider'
-export { TrezorProvider } from './TrezorProvider'
+export { TrezorProvider, TrezorProviderOptions } from './TrezorProvider'
 export { trezorProviderOptions } from './providerOptions'

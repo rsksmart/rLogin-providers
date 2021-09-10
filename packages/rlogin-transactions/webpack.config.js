@@ -14,14 +14,13 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js'],
-    fallback: { stream: require.resolve('stream-browserify') }
+    extensions: ['.ts', '.js']
   },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: 'rLoginTrezorProvider',
+    library: 'RLoginTransctions',
     umdNamedDefine: true,
     globalObject: 'this'
   }

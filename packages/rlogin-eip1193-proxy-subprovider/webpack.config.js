@@ -1,6 +1,8 @@
 const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
+  mode: 'production',
   entry: './src/index.ts',
   devtool: 'source-map',
   module: {
@@ -15,12 +17,17 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js']
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
+    })
+  ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: "RLoginEIP1193Provider",
+    library: 'RLoginEIP1193Provider',
     umdNamedDefine: true,
-    globalObject: "this"
+    globalObject: 'this'
   }
 }

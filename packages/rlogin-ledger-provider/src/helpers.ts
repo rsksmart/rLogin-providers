@@ -1,45 +1,6 @@
-import BN from 'bn.js'
 import AppEth from '@ledgerhq/hw-app-eth'
+import { CompleteTx } from '@rsksmart/rlogin-transactions'
 import { Transaction } from '@ethereumjs/tx'
-
-export interface txPartial {
-  to: string,
-  from: string,
-  value: number,
-  data: string,
-  nonce?: number,
-  gasPrice: number,
-  gasLimit: number,
-}
-
-/**
- * Creates a transaction from transaction data
- * @param provider http provider
- * @param selectedAddress address of the to account
- * @param txData { to: string, from: string, value: number, data: hex }
- * @returns Transaction
- */
-export const createTransaction = (provider: any, selectedAddress: string, txData: any) => {
-  const txParams = {
-    ...txData,
-    to: txData.to.toLowerCase(),
-    from: selectedAddress.toLowerCase(),
-    value: parseInt(txData.value) || '0x0',
-    data: txData.data || '0x0'
-  }
-
-  return Promise.all([
-    provider.getTransactionCount(selectedAddress),
-    provider.gasPrice(),
-    provider.estimateGas(txParams)
-  ])
-    .then((response: BN[]) => ({
-      ...txParams,
-      nonce: response[0].toNumber(),
-      gasPrice: Math.floor(response[1].toNumber() * 1.01),
-      gasLimit: response[2]
-    }))
-}
 
 /**
  * Sign a transaction using the Ledger
@@ -49,7 +10,7 @@ export const createTransaction = (provider: any, selectedAddress: string, txData
  * @returns serialized Transaction
  */
 export const signTransaction = (
-  transactionData: txPartial, appEth: AppEth, path: string, chainId: number
+  transactionData: CompleteTx, appEth: AppEth, path: string, chainId: number
 ) => {
   const txData = {
     ...transactionData,
