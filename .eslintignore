@@ -1,4 +1,3 @@
-/modules/**/node_modules
-/modules/**/lib
-/modules/**/dist
-/modules/ipfs-cpinner-client/webpack.config.js
+/packages/**/node_modules
+/packages/**/dist
+/packages/**/webpack.confi.js

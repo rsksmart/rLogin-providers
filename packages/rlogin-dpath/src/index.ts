@@ -1,10 +1,7 @@
-
 export const getDPathByChainId = (chainId: number): string => {
-  switch(chainId) {
-    //RSK
+  switch (chainId) {
     case 30: return "44'/137'/0'/0/0"
     case 31:
-    //Ethereum
     case 1:
     case 3:
     case 4:

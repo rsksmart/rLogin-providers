@@ -8,7 +8,7 @@ class ProviderRpcError extends Error {
   code: number;
   data?: unknown;
 
-  constructor(message: string, code: number, data?: unknown) {
+  constructor (message: string, code: number, data?: unknown) {
     super(message)
     this.code = code
     this.data = data
@@ -43,7 +43,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
     switch (method) {
       case 'eth_accounts':
       case 'eth_requestAccounts':
-         return [this.selectedAddress]
+        return [this.selectedAddress]
 
       case 'eth_chainId':
       case 'net_version':
@@ -53,19 +53,20 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
         this.validateSender((params as PersonalSignParams)[1])
         return this.personalSign(params)
 
-      case 'eth_sendTransaction':
+      case 'eth_sendTransaction': {
         const { from } = (params as EthSendTransactionParams)[0]
         if (from) this.validateSender((params as EthSendTransactionParams)[0].from)
         else params[0].from = this.selectedAddress
         return this.ethSendTransaction(params)
+      }
 
       default:
         return new Promise((resolve, reject) => {
           this.provider.sendAsync({ method, params }, (err, data) => {
-          if (err) return reject(err)
-          resolve(data)
+            if (err) return reject(err)
+            resolve(data)
+          })
         })
-      })
     }
   }
 

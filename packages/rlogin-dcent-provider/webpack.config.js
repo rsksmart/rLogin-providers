@@ -17,10 +17,10 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     fallback: {
-      assert: require.resolve("assert"),
-      stream: require.resolve("stream-browserify"),
-      url: require.resolve("url/"),
-      util: require.resolve("util/")
+      assert: require.resolve('assert'),
+      stream: require.resolve('stream-browserify'),
+      url: require.resolve('url/'),
+      util: require.resolve('util/')
     }
   },
   plugins: [
@@ -32,8 +32,8 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: "rLoginLedgerProvider",
+    library: 'rLoginLedgerProvider',
     umdNamedDefine: true,
-    globalObject: "this"
+    globalObject: 'this'
   }
 }

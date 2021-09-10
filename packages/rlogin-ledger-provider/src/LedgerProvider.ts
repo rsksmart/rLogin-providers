@@ -1,5 +1,5 @@
-import TransportWebHID from "@ledgerhq/hw-transport-webhid";
-import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
+import TransportWebHID from '@ledgerhq/hw-transport-webhid'
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
 import { signTransaction } from './helpers'
@@ -55,7 +55,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     }
   }
 
-  #validateIsConnected() {
+  #validateIsConnected () {
     if (!this.appEthConnected) throw new Error('You need to connect the device first')
   }
 
@@ -69,30 +69,30 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     let transport: Transport
     try {
       transport = await TransportWebHID.create()
-    } catch(e){
+    } catch (e) {
       transport = await TransportWebUSB.create()
     }
 
-    try{
+    try {
       this.appEth = new AppEth(transport)
       this.appEthConnected = true
       const result = await this.appEth.getAddress(this.dpath)
       this.selectedAddress = result.address
       return this
-    } catch(error) {
+    } catch (error) {
       throw new Error(this.#handleLedgerError(error))
     }
   }
 
-  async ethSendTransaction(params: EthSendTransactionParams): Promise<string> {
+  async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {
     this.#validateIsConnected()
     const transaction = await createTransaction(this.provider, this.selectedAddress, params[0])
-    const serializedTx: string =  await signTransaction(transaction, this.appEth, this.dpath, this.chainId)
+    const serializedTx: string = await signTransaction(transaction, this.appEth, this.dpath, this.chainId)
     return await this.provider.sendRawTransaction(`0x${serializedTx}`)
   }
 
   // reference: https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth#signpersonalmessage
-  async personalSign(params: PersonalSignParams): Promise<string> {
+  async personalSign (params: PersonalSignParams): Promise<string> {
     this.#validateIsConnected()
 
     const result = await this.appEth.signPersonalMessage(this.dpath, Buffer.from(params[0]).toString('hex'))
@@ -105,7 +105,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     return `0x${result.r}${result.s}${v2}`
   }
 
-  async disconnect(){
+  async disconnect () {
     this.appEth.transport.close()
 
     this.selectedAddress = null

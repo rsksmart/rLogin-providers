@@ -20,8 +20,8 @@ module.exports = {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: "RLoginEIP1193Provider",
+    library: 'RLoginEIP1193Provider',
     umdNamedDefine: true,
-    globalObject: "this"
+    globalObject: 'this'
   }
 }

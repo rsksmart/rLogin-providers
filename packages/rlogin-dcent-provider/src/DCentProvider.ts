@@ -37,15 +37,16 @@ export class DCentProvider extends RLoginEIP1193Provider {
 
   /**
    * Simple logger
-   * 
+   *
    * @param params any
    * @returns null
    */
   #logger = (...params: any) => this.#debug && console.log(...params)
 
-  #validateIsConnected() {
+  #validateIsConnected () {
     if (!this.enabled) throw new Error('You need to connect the device first')
   }
+
   /**
    * Connect to the Dcent physical device.
    *
@@ -60,9 +61,9 @@ export class DCentProvider extends RLoginEIP1193Provider {
 
   /**
    * Sign personal message with Dcent.
-   * 
-   * @param message 
-   * @returns 
+   *
+   * @param message
+   * @returns
    */
   async personalSign (params: PersonalSignParams) {
     this.#validateIsConnected()
@@ -75,10 +76,10 @@ export class DCentProvider extends RLoginEIP1193Provider {
 
   /**
    * Create enable and send transaction using Dcent provider.
-   * 
-   * @param to 
-   * @param value 
-   * @param data 
+   *
+   * @param to
+   * @param value
+   * @param data
    * @returns Tx object, signature include.
    */
   async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {

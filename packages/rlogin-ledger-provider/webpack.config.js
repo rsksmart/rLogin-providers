@@ -16,22 +16,22 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
-    fallback:{
-      "stream": require.resolve("stream-browserify")
+    fallback: {
+      stream: require.resolve('stream-browserify')
     }
   },
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
     }),
-    new webpack.DefinePlugin({process: {env: { DEBUG: false }}})
+    new webpack.DefinePlugin({ process: { env: { DEBUG: false } } })
   ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: "rLoginLedgerProvider",
+    library: 'rLoginLedgerProvider',
     umdNamedDefine: true,
-    globalObject: "this"
+    globalObject: 'this'
   }
 }

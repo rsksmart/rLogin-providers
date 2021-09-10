@@ -54,7 +54,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     return code ? `Trezor: ${code} - ${message}` : message
   }
 
-  #validateIsConnected() {
+  #validateIsConnected () {
     if (!this.initializaed || !this.connected) throw new Error('You need to connect the device first')
   }
 
@@ -104,12 +104,15 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     this.#validateIsConnected()
 
     const transaction = await createTransaction(this.provider, this.selectedAddress!, params[0])
-    const result = await TrezorConnect.ethereumSignTransaction({ path: this.path, transaction: {
-      ...transaction,
-      nonce: `0x${transaction.nonce.toString(16)}`,
-      gasPrice: `0x${transaction.gasPrice.toString(16)}`,
-      gasLimit: `0x${transaction.gasLimit.toString(16)}`
-    }})
+    const result = await TrezorConnect.ethereumSignTransaction({
+      path: this.path,
+      transaction: {
+        ...transaction,
+        nonce: `0x${transaction.nonce.toString(16)}`,
+        gasPrice: `0x${transaction.gasPrice.toString(16)}`,
+        gasLimit: `0x${transaction.gasLimit.toString(16)}`
+      }
+    })
 
     if (result.success) {
       const signedTransaction = new Transaction({
