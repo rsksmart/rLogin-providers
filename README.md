@@ -52,3 +52,9 @@ npm run build
 - `develop` has latest approved PR. PRs need to pass `ci` and _LGTM_. Do squash & merge.
 - Use branches pointing to `develop` to add new PRs.
 - Do external PRs against latest commit in `develop`.
+
+### Acknowledgement
+
+- Ethereum network: EIP-1559 specifications not supported.
+- One by one transaction. Confirm must be reached before do a second transaction.
+- Transactions field mandatory: "to". Any others are optionals or provided by the library.
