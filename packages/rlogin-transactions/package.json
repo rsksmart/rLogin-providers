@@ -1,7 +1,7 @@
 {
-  "name": "@rsksmart/rlogin-eip1193-proxy-subprovider",
+  "name": "@rsksmart/rlogin-transactions",
   "version": "1.0.0-beta.7",
-  "description": "rLogin - EIP-1193 subprovider",
+  "description": "rLogin - transactions helper",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -31,8 +31,6 @@
     "@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.7"
   },
   "dependencies": {
-		"buffer": "^6.0.3",
-    "ethjs-provider-http": "^0.1.6",
-    "ethjs-query": "^0.3.8"
+    "bn.js": "^5.2.0"
   }
 }

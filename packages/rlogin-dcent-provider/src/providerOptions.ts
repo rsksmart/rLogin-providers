@@ -1,4 +1,4 @@
-import { RLoginDcentProvider, IRLoginDcentProviderOptions } from './DCentProvider'
+import { DCentProvider, DCentProviderOptions } from './DCentProvider'
 
 export const dcentProviderOptions = {
   display: {
@@ -6,10 +6,10 @@ export const dcentProviderOptions = {
     name: 'D\'Cent',
     description: 'Connect your D\'Cent Hardware Wallet'
   },
-  connector: async (ProviderPackage, options: IRLoginDcentProviderOptions) => {
+  connector: async (ProviderPackage, options: DCentProviderOptions) => {
     const provider = new ProviderPackage(options)
     await provider.connect()
     return provider
   },
-  package: RLoginDcentProvider
+  package: DCentProvider
 }

@@ -1,4 +1,4 @@
-import { TrezorProvider, ITrezorProviderOptions } from './TrezorProvider'
+import { TrezorProvider, TrezorProviderOptions } from './TrezorProvider'
 
 export const trezorProviderOptions = {
   display: {
@@ -6,7 +6,7 @@ export const trezorProviderOptions = {
     name: 'Trezor',
     description: 'Connect your Trezor Hardware Wallet'
   },
-  connector: async (ProviderPackage: any, options: ITrezorProviderOptions) => {
+  connector: async (ProviderPackage: any, options: TrezorProviderOptions) => {
     const provider = new ProviderPackage(options)
     await provider.connect()
     return provider

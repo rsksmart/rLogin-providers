@@ -1,9 +1,6 @@
 import AppEth from '@ledgerhq/hw-app-eth'
+import { CompleteTx } from '@rsksmart/rlogin-transactions'
 import { Transaction } from '@ethereumjs/tx'
-import { tx } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-export interface txPartialLedger extends tx {
-  from: string
-}
 
 /**
  * Sign a transaction using the Ledger
@@ -13,7 +10,7 @@ export interface txPartialLedger extends tx {
  * @returns serialized Transaction
  */
 export const signTransaction = (
-  transactionData: txPartialLedger, appEth: AppEth, path: string, chainId: number
+  transactionData: CompleteTx, appEth: AppEth, path: string, chainId: number
 ) => {
   const txData = {
     ...transactionData,

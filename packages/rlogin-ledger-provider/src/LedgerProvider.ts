@@ -1,25 +1,34 @@
-import TransportWebHID from "@ledgerhq/hw-transport-webhid";
-import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
+import TransportWebHID from '@ledgerhq/hw-transport-webhid'
+import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
 import { signTransaction } from './helpers'
-import { RLoginEIP1193Provider, createTransaction, tx } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-export interface txPartialLedger extends tx {
-  from: string
+import { PersonalSignParams, EthSendTransactionParams } from '@rsksmart/rlogin-eip1193-types'
+import { RLoginEIP1193ProviderOptions, RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+import { createTransaction } from '@rsksmart/rlogin-transactions'
+import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
+
+type LedgerProviderOptions = RLoginEIP1193ProviderOptions & {
+  debug?: boolean
+  dPath?: string
 }
+
 export class LedgerProvider extends RLoginEIP1193Provider {
-  #appEth: AppEth | null
-  #debug: boolean
+  public readonly isLedger = true
 
-  selectedAddress: string | null
-  isLedger = true
+  protected dpath: string
 
-  constructor (opts: { chainId: number | string; rpcUrl: string, dPath?:string, debug?: boolean }) {
-    super(opts.rpcUrl, opts.chainId, opts.dPath)
-    this.#debug = opts.debug || false
-    // to be set during connect
-    this.#appEth = null
-    this.selectedAddress = null
+  private appEthConnected: boolean = false
+  private appEth?: AppEth
+
+  private debug: boolean
+
+  constructor ({ chainId, rpcUrl, dPath, debug }: LedgerProviderOptions) {
+    super({ rpcUrl, chainId })
+
+    this.debug = !!debug
+
+    this.dpath = dPath || getDPathByChainId(chainId)
   }
 
   /**
@@ -27,7 +36,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
    * @param params any
    * @returns null
    */
-  #logger = (...params: any) => this.#debug && console.log(...params)
+  #logger = (...params: any) => this.debug && console.log(...params)
 
   /**
    * Attempt to parse an UNKNOWN_ERROR returned from Ledger.
@@ -46,49 +55,62 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     }
   }
 
+  #validateIsConnected () {
+    if (!this.appEthConnected) throw new Error('You need to connect the device first')
+  }
+
   /**
    * Connect to the Ledger physical device
    * @returns Ledger EIP1193 Provider Wrapper
    */
-  async connect (): Promise<any> {
+  async connect (): Promise<RLoginEIP1193Provider> {
     this.#logger('🦄 attempting to connect!')
+
     let transport: Transport
     try {
       transport = await TransportWebHID.create()
-    } catch(e){
+    } catch (e) {
       transport = await TransportWebUSB.create()
     }
-    try{
-      this.#appEth = new AppEth(transport)
+
+    try {
+      this.appEth = new AppEth(transport)
       this.appEthConnected = true
-      const result = await this.#appEth.getAddress(this.path)
+      const result = await this.appEth.getAddress(this.dpath)
       this.selectedAddress = result.address
       return this
-    } catch(error) {
-      throw this.#handleLedgerError(error)
+    } catch (error) {
+      throw new Error(this.#handleLedgerError(error))
     }
   }
 
-  async ethSendTransaction(to:string, value:number|string, data: string): Promise<string> {
-    const transaction: txPartialLedger = await createTransaction(this.provider, this.selectedAddress,{ to, from: this.selectedAddress, value, data })
-    const serializedTx: string =  await signTransaction(transaction, this.#appEth, this.path, this.chainId)
+  async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {
+    this.#validateIsConnected()
+    const transaction = await createTransaction(this.provider, this.selectedAddress, params[0])
+    const serializedTx: string = await signTransaction(transaction, this.appEth, this.dpath, this.chainId)
     return await this.provider.sendRawTransaction(`0x${serializedTx}`)
   }
-  
+
   // reference: https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth#signpersonalmessage
-  async personalSign(message:string):Promise<string> {
-    const result = await this.#appEth.signPersonalMessage(this.path, Buffer.from(message).toString('hex'))
+  async personalSign (params: PersonalSignParams): Promise<string> {
+    this.#validateIsConnected()
+
+    const result = await this.appEth.signPersonalMessage(this.dpath, Buffer.from(params[0]).toString('hex'))
     const v = result.v - 27
     let v2 = v.toString(16)
     if (v2.length < 2) {
       v2 = '0' + v
     }
+
     return `0x${result.r}${result.s}${v2}`
   }
-  async disconnect(){
-    this.#appEth.transport.close()
+
+  async disconnect () {
+    this.appEth.transport.close()
+
     this.selectedAddress = null
     this.appEthConnected = false
-    this.#appEth = null
+
+    this.appEth = null
   }
 }

@@ -1,148 +1,93 @@
-import DcentWebConnector from 'dcent-web-connector'
-import DcentProvider from 'dcent-provider'
-import { RLoginEIP1193Provider, createTransaction, tx } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-export interface txPartialDcent extends tx {
-  coinType: string
-}
+import DCentRPCProvider from 'dcent-provider'
+import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
+import { EthSendTransactionParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
+import { createTransaction } from '@rsksmart/rlogin-transactions'
 
-export interface IRLoginDcentProviderOptions {
-  chainId: number | string;
-  config?: { addressSearchLimit: number, shouldAskForOnDeviceConfirmation: boolean };
-  manifestEmail: string;
-  manifestAppUrl: string;
-  rpcUrl: string;
+export type DCentProviderOptions = RLoginEIP1193ProviderOptions & {
   dPath?: string
+  debug?: boolean
 }
 
-export class RLoginDcentProvider extends RLoginEIP1193Provider {
-  #opts : IRLoginDcentProviderOptions
-  #debug: boolean
-  isDcent = true
+export class DCentProvider extends RLoginEIP1193Provider {
+  public readonly isDcent = true
 
-  constructor (opts: IRLoginDcentProviderOptions) {
-    super(opts.rpcUrl, opts.chainId, opts.dPath)
-    this.#logger('RLoginDcentProvider constructor!', opts)
-    this.#opts = opts
+  path: string
+  rpcUrl: string
+
+  #debug: boolean
+
+  appEthInitialized = false
+  appEthConnected = false
+  enabled = false
+
+  dcentProvider: typeof DCentRPCProvider
+
+  constructor ({ rpcUrl, chainId, dPath, debug }: DCentProviderOptions) {
+    super({ rpcUrl, chainId })
+
+    this.#debug = debug
+    this.path = dPath
+    this.rpcUrl = rpcUrl
+
+    this.dcentProvider = new DCentRPCProvider({
+      rpcUrl: this.rpcUrl,
+      chainId: this.chainId
+    })
   }
 
   /**
    * Simple logger
-   * 
+   *
    * @param params any
    * @returns null
    */
   #logger = (...params: any) => this.#debug && console.log(...params)
 
-  /**
-   * Attempt to parse an UNKNOWN_ERROR returned from Dcent.
-   *
-   * @param err Error Object
-   * @param reject Reject from the parent's promise
-   * @returns returns the rejected promise
-   */
-  #handleDcentError = (message: string, code?: string): string => {
-    this.#logger('🦄 try to interpret the error: ', { message, code })
-    return code ? `Dcent: ${code} - ${message}` : message
+  #validateIsConnected () {
+    if (!this.enabled) throw new Error('You need to connect the device first')
   }
 
   /**
    * Connect to the Dcent physical device.
-   * 
+   *
    * @returns Dcent EIP1193 Provider Wrapper
    */
   async connect (): Promise<any> {
-    try {
-      let result
-      if (!this.appEthInitialized) {
-        this.#logger('🦄 attempting to initialize!')
-      
-        result = await DcentWebConnector.getDeviceInfo()
-        this.#logger({ result })
-        this.appEthInitialized = true
-      }
-      
-      if (!this.appEthConnected) {
-        this.#logger('🦄 attempting to connect!')
-        result = await DcentWebConnector.getAccountInfo()
-
-        var coinType = DcentWebConnector.coinType.ETHEREUM
-        result = await DcentWebConnector.getAddress(coinType, this.path)
-
-        if (result.header.status === 'success') {
-          this.appEthConnected = true
-          this.selectedAddress = result.body.parameter.address
-          DcentWebConnector.popupWindowClose()
-        } else {
-          this.#handleDcentError(result.payload.error, result.payload.code)
-        }
-      }
-      
-      return this
-    } catch (e) {
-      this.#handleDcentError(e.message)
-    }
+    const accounts = await this.dcentProvider.enable()
+    this.selectedAddress = accounts[0]
+    this.enabled = true
+    return this
   }
 
   /**
    * Sign personal message with Dcent.
-   * 
-   * @param message 
-   * @returns 
+   *
+   * @param message
+   * @returns
    */
-  async personalSign (message:string) {
-    let result
-    try {
-      result = await DcentWebConnector.getEthereumSignedMessage(message, this.path)
-      this.#logger({ result })
-      return result.body.parameter.sign
-    } catch (error) {
-      this.#handleDcentError(result.payload.error, result.payload.code)
-    } finally {
-      DcentWebConnector.popupWindowClose()
-    }
+  async personalSign (params: PersonalSignParams) {
+    this.#validateIsConnected()
+    this.#logger('🦄 attempting to sign message!')
+    return await this.dcentProvider.send(
+      'personal_sign',
+      [`0x${Buffer.from(params[0]).toString('hex')}`, params[1]]
+    )
   }
 
   /**
    * Create enable and send transaction using Dcent provider.
-   * 
-   * @param to 
-   * @param value 
-   * @param data 
+   *
+   * @param to
+   * @param value
+   * @param data
    * @returns Tx object, signature include.
    */
-  async ethSendTransaction (to:string, value:number|string, data: string): Promise<string> {
-    if (!this.appEthConnected) {
-      throw new Error('Please connect before sending requests.')
-    }
+  async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {
+    this.#validateIsConnected()
 
-    const tx = await createTransaction(this.provider, this.selectedAddress!,
-    {
-      to,
-      value,
-      data
-    })
+    const transaction = await createTransaction(this.provider, this.selectedAddress!, params[0])
 
-    const my_provider = new DcentProvider({
-      rpcUrl: this.#opts.rpcUrl,
-      chainId: this.chainId
-    })
-
-    const result = await my_provider.enable()
-    
-    const transaction = {
-      from: tx.from,
-      gasPrice: tx.gasPrice,
-      gas: tx.gasLimit,
-      to: tx.to,
-      value: tx.value,
-      data: tx.data
-    }
-
-    try {
-      this.#logger('🦄 attempting to send tx!')
-      return await my_provider.send('eth_sendTransaction', transaction)
-    } catch (error) {
-      this.#handleDcentError(error.message, error.code)
-    }
+    this.#logger('🦄 attempting to send tx!')
+    return await this.dcentProvider.send('eth_sendTransaction', transaction)
   }
 }

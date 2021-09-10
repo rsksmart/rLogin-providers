@@ -1,98 +1,72 @@
 import HttpProvider from 'ethjs-provider-http'
 import Eth from 'ethjs-query'
-import BN from 'bn.js'
-import {IRLoginEIP1193Provider} from './types'
+import { IRLoginEIP1193Provider, EthSendTransactionParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 
-export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider{
-  protected appEthInitialized: boolean = false
-  protected appEthConnected: boolean = false
-  protected chainId: number
-  protected path: string
-  protected provider: any
+export type RLoginEIP1193ProviderOptions = { rpcUrl: string, chainId: number }
 
-  selectedAddress: string | null
+class ProviderRpcError extends Error {
+  code: number;
+  data?: unknown;
 
-  constructor (rpcUrl: string, chainId: number | string, dPath?: string) {
-    if (!rpcUrl || !chainId) {
-      throw (new Error('chainId and rpcUrl are required in the constructor options.'))
-    }
-    this.chainId = typeof chainId === 'number'? chainId : parseInt(chainId) 
+  constructor (message: string, code: number, data?: unknown) {
+    super(message)
+    this.code = code
+    this.data = data
+  }
+}
+
+export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
+  protected selectedAddress?: string
+  readonly chainId: number
+
+  protected provider: typeof Eth
+
+  constructor ({ rpcUrl, chainId }: RLoginEIP1193ProviderOptions) {
+    if (!rpcUrl) throw new Error('rpcUrl is required')
+    if (!chainId) throw new Error('chainId is required')
+
+    this.chainId = chainId
+
     this.provider = new Eth(new HttpProvider(rpcUrl))
-
-    // is the trezor using the Ethereum app or the RSK app:
-    this.path = dPath? dPath : this.#getDPath(this.chainId)
-    this.appEthInitialized = false
-
-    // to be set during connect
-    this.selectedAddress = null
   }
 
-  #getDPath(chainId: number): string {
-    switch(chainId) {
-      //RSK
-      case 30: return "44'/137'/0'/0/0"
-      case 31: 
-      //Ethereum
-      case 1:
-      case 3: 
-      case 4:
-      case 5:
-          return "m/44'/60'/0'/0/0"
-      
-      default:
-          throw new Error('Network not supported please specify the derivation path')
-    }
+  abstract ethSendTransaction(params: EthSendTransactionParams): Promise<string>;
+  abstract personalSign(params: PersonalSignParams): Promise<string>;
+
+  private validateSender (sender: string) {
+    if (sender.toLowerCase() !== this.selectedAddress.toLowerCase()) throw new ProviderRpcError('The requested account has not been authorized by the user', 4100)
   }
 
-  // If connect is successful it should set appEthInitialized and appEthConnected to true
-  abstract connect(): Promise<IRLoginEIP1193Provider>;
-  abstract ethSendTransaction(to:string, value:number|string, data: string):Promise<string>;
-  abstract personalSign(message:string):Promise<string>;
-
-  async request (request: { method: string, params?: any }): Promise<any> {
-    if (!this.appEthConnected) {
-      throw new Error('Please connect before sending requests.')
-    }
-
-    const { method, params } = request
+  async request ({ method, params }): Promise<any> {
     console.log('🦄 incoming request:', method, params)
 
     switch (method) {
       case 'eth_accounts':
       case 'eth_requestAccounts':
-         return [this.selectedAddress]
+        return [this.selectedAddress]
+
       case 'eth_chainId':
       case 'net_version':
         return `0x${this.chainId.toString(16)}`
-      case 'eth_getBalance':
-        return this.provider.getBalance(this.selectedAddress).then((response:any) => response.toString('hex'))
-      case 'eth_getTransactionReceipt':
-        return new Promise((resolve, reject) =>
-          this.provider.getTransactionReceipt(params[0], (error: Error, result: any) =>
-            error ? reject(error) : resolve(result || null))
-        )
-      case 'personal_sign':
-        return this.personalSign(params[0])
-      case 'eth_sendTransaction':
-        return this.ethSendTransaction(params[0].to, params[0].value, params[0].data)
-      case 'eth_call':
-        return this.provider.call(params[0], params[1])
 
-      // returns promise
-      case 'eth_estimateGas':
-        return this.provider.estimateGas({
-          ...params[0],
-          value: params[0].value || 0,
-          data: params[0].data || '0x0'
-        }).then((estimate: BN) => estimate.toNumber())
+      case 'personal_sign':
+        this.validateSender((params as PersonalSignParams)[1])
+        return this.personalSign(params)
+
+      case 'eth_sendTransaction': {
+        const { from } = (params as EthSendTransactionParams)[0]
+        if (from) this.validateSender((params as EthSendTransactionParams)[0].from)
+        else params[0].from = this.selectedAddress
+        return this.ethSendTransaction(params)
+      }
 
       default:
         return new Promise((resolve, reject) => {
-          this.provider.sendAsync(request, (err, data) => {
-          if (err) return reject(err)
-          resolve(data)
+          this.provider.sendAsync({ method, params }, (err, data) => {
+            if (err) return reject(err)
+            resolve(data)
+          })
         })
-      })
     }
   }
 
@@ -107,20 +81,6 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider{
       .catch((error: Error) => cb(error, null))
   }
 
-  /**
-   * Support .enable function used with older dapps
-   * @returns accounts[] array
-   */
-  enable () {
-    return new Promise((resolve, reject) =>
-      this.selectedAddress
-        ? resolve([this.selectedAddress])
-        : this.connect()
-          .then(() => resolve([this.selectedAddress]))
-          .catch(reject))
-  }
-
-  // Event listeners
   on (method: string) {
     console.log('🦄 registering action ', method)
   }

@@ -1,6 +1,7 @@
 const path = require('path')
 
 module.exports = {
+  mode: 'production',
   entry: './src/index.ts',
   devtool: 'source-map',
   module: {
@@ -14,14 +15,14 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
-    fallback: { "stream": require.resolve("stream-browserify") }
+    fallback: { stream: require.resolve('stream-browserify') }
   },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: "rLoginTrezorProvider",
+    library: 'rLoginTrezorProvider',
     umdNamedDefine: true,
-    globalObject: "this"
+    globalObject: 'this'
   }
 }

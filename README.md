@@ -10,12 +10,18 @@ This libraries are a set of wrappers that are used by [`@rsksmart/rLogin`](https
 
 ## Packages
 
-- `@rsmsart/rlogin-ledger-provider` - wrapper for Ledger [`@ledgerhq/hw-app-eth`](https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth)
-- `@rsmsart/rlogin-trezor-provider` - wrapper for Trezor [`trezor-connect`](https://github.com/trezor/connect)
+EIP-1193 adapters:
+
+- `@rsmsart/rlogin-ledger-provider` - adapter for Ledger [`@ledgerhq/hw-app-eth`](https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth)
+- `@rsmsart/rlogin-trezor-provider` - adapter for Trezor [`trezor-connect`](https://github.com/trezor/connect)
+- `@rsmsart/rlogin-dcent-provider` - adapter for D'Cent [`dcent-provider`](https://github.com/DcentWallet/dcent-provider)
 
 Internals:
 
+- `@rsmsart/rlogin-eip1193-types` - types for EIP-1193
 - `@rsmsart/rlogin-eip1193-proxy-subprovider` - fallbacks RPC requests to [`ethjs-query`](https://github.com/ethjs/ethjs-query)
+- `@rsmsart/rlogin-transactions` - completes transaction fields (gas price, gas limit and nonce)
+- `@rsmsart/rlogin-dpath` - calculates derivation paths for RSK
 
 ## Run for development
 
