@@ -1,6 +1,6 @@
 {
 	"name": "@rsksmart/rlogin-ledger-provider",
-	"version": "1.0.0-beta.6",
+	"version": "1.0.0-beta.7",
 	"description": "rLogin - Ledger EIP-1193 provider",
 	"main": "dist/bundle.js",
 	"types": "dist/index.d.ts",
@@ -28,16 +28,16 @@
 	},
 	"homepage": "https://github.com/rsksmart/rLogin-providers#readme",
 	"devDependencies": {
-    "@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.5"
+    "@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.7"
 	},
 	"dependencies": {
 		"@ethereumjs/tx": "^3.3.0",
 		"@ledgerhq/hw-app-eth": "^6.2.0",
 		"@ledgerhq/hw-transport-webhid": "^6.4.1",
 		"@ledgerhq/hw-transport-webusb": "^6.3.0",
-    "@rsksmart/rlogin-dpath": "^1.0.0-beta.5",
-    "@rsksmart/rlogin-transactions": "^1.0.0-beta.5",
-    "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.5",
+    "@rsksmart/rlogin-dpath": "^1.0.0-beta.7",
+    "@rsksmart/rlogin-transactions": "^1.0.0-beta.7",
+    "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.7",
 		"assert": "^2.0.0",
 		"bn.js": "^5.2.0",
 		"buffer": "^6.0.3",

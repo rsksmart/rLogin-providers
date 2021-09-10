@@ -1,6 +1,6 @@
 {
   "name": "@rsksmart/rlogin-eip1193-types",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.7",
   "description": "rLogin - EIP-1193 types",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
