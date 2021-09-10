@@ -1,5 +1,4 @@
 const path = require('path')
-const webpack = require('webpack')
 
 module.exports = {
   mode: 'production',
@@ -15,24 +14,13 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js'],
-    fallback: {
-      assert: require.resolve('assert'),
-      stream: require.resolve('stream-browserify'),
-      url: require.resolve('url/'),
-      util: require.resolve('util/')
-    }
+    extensions: ['.ts', '.js']
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer']
-    })
-  ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: 'rLoginLedgerProvider',
+    library: 'RLoginDPath',
     umdNamedDefine: true,
     globalObject: 'this'
   }
