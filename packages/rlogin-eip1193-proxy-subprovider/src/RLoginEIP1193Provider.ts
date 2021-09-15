@@ -49,6 +49,11 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
       case 'net_version':
         return `0x${this.chainId.toString(16)}`
 
+      case 'eth_sign':
+        params = [params[1], params[0]]
+        this.validateSender((params as PersonalSignParams)[1])
+        return this.personalSign(params)
+
       case 'personal_sign':
         this.validateSender((params as PersonalSignParams)[1])
         return this.personalSign(params)
@@ -62,7 +67,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
 
       default:
         return new Promise((resolve, reject) => {
-          this.provider.sendAsync({ method, params }, (err, data) => {
+          this.provider.rpc.sendAsync({ method, params }, (err, data) => {
             if (err) return reject(err)
             resolve(data)
           })
