@@ -52,6 +52,10 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
       case 'eth_sign':
         params = [params[1], params[0]]
         this.validateSender((params as PersonalSignParams)[1])
+        // some web3 clients still use eth_sign RPC
+        // this implementation is based on ethers.js redirecting metamask and ledger to personal_sign
+        // ref: https://github.com/ethers-io/ethers.js/blob/f2a32d0d5b4ea3721d3f3ee14db56e0519cf337f/packages/providers/src.ts/web3-provider.ts#L35
+        // ref: https://github.com/ethers-io/ethers.js/blob/f2a32d0d5b4ea3721d3f3ee14db56e0519cf337f/packages/hardware-wallets/src.ts/ledger.ts#L93
         return this.personalSign(params)
 
       case 'personal_sign':

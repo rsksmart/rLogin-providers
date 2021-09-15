@@ -22,7 +22,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   path: string
 
   opts: TrezorOptions
-  initializaed = false
+  initialized = false
   connected = false
 
   debug = false
@@ -55,11 +55,11 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   }
 
   #validateIsConnected () {
-    if (!this.initializaed || !this.connected) throw new Error('You need to connect the device first')
+    if (!this.initialized || !this.connected) throw new Error('You need to connect the device first')
   }
 
   async connect (): Promise<any> {
-    if (!this.initializaed) {
+    if (!this.initialized) {
       this.#logger('🦄 attempting to initialize!')
       try {
         await TrezorConnect.init({
@@ -69,7 +69,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
             appUrl: this.opts.manifestAppUrl
           }
         })
-        this.initializaed = true
+        this.initialized = true
       } catch (e) {
         throw new Error(this.#handleTrezorError(e.message))
       }
