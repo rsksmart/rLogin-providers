@@ -89,10 +89,10 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     return this
   }
 
-  async personalSign (params: PersonalSignParams) {
+  async personalSign (params: PersonalSignParams, hex:boolean): Promise<string> {
     this.#validateIsConnected()
 
-    const result = await TrezorConnect.ethereumSignMessage({ path: this.path, message: params[0], hex: false })
+    const result = await TrezorConnect.ethereumSignMessage({ path: this.path, message: params[0], hex })
     if (result.success) {
       return result.payload.signature
     } else {
