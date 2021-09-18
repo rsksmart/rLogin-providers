@@ -1,6 +1,5 @@
 import TrezorConnect from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
-import BN from 'bn.js'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { EthSendTransactionParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
@@ -81,7 +80,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
 
       if (result.success) {
         this.connected = true
-        this.selectedAddress = result.payload.address
+        this.selectedAddress = result.payload.address.toLowerCase()
       } else {
         throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
       }
@@ -104,21 +103,22 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     this.#validateIsConnected()
 
     const transaction = await createTransaction(this.provider, this.selectedAddress!, params[0])
+    const tx = {
+      ...transaction,
+      nonce: `0x${transaction.nonce.toString(16)}`,
+      gasPrice: `0x${transaction.gasPrice.toString(16)}`,
+      gasLimit: `0x${transaction.gasLimit.toString(16)}`,
+      chainId: this.chainId
+    }
     const result = await TrezorConnect.ethereumSignTransaction({
       path: this.path,
-      transaction: {
-        ...transaction,
-        nonce: `0x${transaction.nonce.toString(16)}`,
-        gasPrice: `0x${transaction.gasPrice.toString(16)}`,
-        gasLimit: `0x${transaction.gasLimit.toString(16)}`
-      }
+      transaction: tx
     })
 
     if (result.success) {
       const signedTransaction = new Transaction({
         ...transaction,
-        ...result.payload,
-        chainId: `0x${(new BN(this.chainId)).toString(16)}`
+        ...result.payload
       })
       return await this.provider.sendRawTransaction(`0x${signedTransaction.serialize().toString('hex')}`)
     } else {

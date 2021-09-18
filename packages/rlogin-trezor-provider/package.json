@@ -39,6 +39,6 @@
     "buffer": "^6.0.3",
 		"ethjs-provider-http": "^0.1.6",
 		"stream-browserify": "^3.0.0",
-		"trezor-connect": "^8.1.29"
+		"trezor-connect": "^8.2.1"
 	}
 }
