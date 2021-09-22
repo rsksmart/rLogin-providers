@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
   mode: 'production',
@@ -17,6 +18,12 @@ module.exports = {
     extensions: ['.ts', '.js'],
     fallback: { stream: require.resolve('stream-browserify') }
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer']
+    }),
+    new webpack.DefinePlugin({ process: { env: { DEBUG: false } } })
+  ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),

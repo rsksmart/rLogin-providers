@@ -26,13 +26,14 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    })
+    }),
+    new webpack.DefinePlugin({ process: { env: { DEBUG: false } } })
   ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: 'rLoginLedgerProvider',
+    library: 'rLoginDCentProvider',
     umdNamedDefine: true,
     globalObject: 'this'
   }

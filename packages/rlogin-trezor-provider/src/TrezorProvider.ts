@@ -1,6 +1,5 @@
 import TrezorConnect from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
-import BN from 'bn.js'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { EthSendTransactionParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
@@ -22,7 +21,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   path: string
 
   opts: TrezorOptions
-  initializaed = false
+  initialized = false
   connected = false
 
   debug = false
@@ -55,11 +54,11 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   }
 
   #validateIsConnected () {
-    if (!this.initializaed || !this.connected) throw new Error('You need to connect the device first')
+    if (!this.initialized || !this.connected) throw new Error('You need to connect the device first')
   }
 
   async connect (): Promise<any> {
-    if (!this.initializaed) {
+    if (!this.initialized) {
       this.#logger('🦄 attempting to initialize!')
       try {
         await TrezorConnect.init({
@@ -69,7 +68,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
             appUrl: this.opts.manifestAppUrl
           }
         })
-        this.initializaed = true
+        this.initialized = true
       } catch (e) {
         throw new Error(this.#handleTrezorError(e.message))
       }
@@ -81,7 +80,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
 
       if (result.success) {
         this.connected = true
-        this.selectedAddress = result.payload.address
+        this.selectedAddress = result.payload.address.toLowerCase()
       } else {
         throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
       }
@@ -89,10 +88,10 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     return this
   }
 
-  async personalSign (params: PersonalSignParams) {
+  async personalSign (params: PersonalSignParams, hex:boolean): Promise<string> {
     this.#validateIsConnected()
 
-    const result = await TrezorConnect.ethereumSignMessage({ path: this.path, message: params[0], hex: false })
+    const result = await TrezorConnect.ethereumSignMessage({ path: this.path, message: params[0], hex })
     if (result.success) {
       return result.payload.signature
     } else {
@@ -104,21 +103,22 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     this.#validateIsConnected()
 
     const transaction = await createTransaction(this.provider, this.selectedAddress!, params[0])
+    const tx = {
+      ...transaction,
+      nonce: `0x${transaction.nonce.toString(16)}`,
+      gasPrice: `0x${transaction.gasPrice.toString(16)}`,
+      gasLimit: `0x${transaction.gasLimit.toString(16)}`,
+      chainId: this.chainId
+    }
     const result = await TrezorConnect.ethereumSignTransaction({
       path: this.path,
-      transaction: {
-        ...transaction,
-        nonce: `0x${transaction.nonce.toString(16)}`,
-        gasPrice: `0x${transaction.gasPrice.toString(16)}`,
-        gasLimit: `0x${transaction.gasLimit.toString(16)}`
-      }
+      transaction: tx
     })
 
     if (result.success) {
       const signedTransaction = new Transaction({
         ...transaction,
-        ...result.payload,
-        chainId: `0x${(new BN(this.chainId)).toString(16)}`
+        ...result.payload
       })
       return await this.provider.sendRawTransaction(`0x${signedTransaction.serialize().toString('hex')}`)
     } else {
