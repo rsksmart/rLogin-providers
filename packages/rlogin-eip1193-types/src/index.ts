@@ -24,6 +24,8 @@ export interface IRLoginEIP1193Provider {
     request(args: { method: 'personal_sign', params: PersonalSignParams }): Promise<string>
     request(args: { method: 'eth_sign', params: SignParams }): Promise<string>
 
+    request(args: { method: 'eth_signTypedData_v4', params: any }): Promise<string>
+
     request(args: { method: string, params?: any[] }): Promise<any>
     sendAsync(request: { method: string; params?: any;}, cb: any): void;
 

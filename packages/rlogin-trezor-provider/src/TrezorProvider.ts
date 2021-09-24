@@ -133,4 +133,17 @@ export class TrezorProvider extends RLoginEIP1193Provider {
       throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
     }
   }
+
+  /**
+   * TODO Create sign typed data using Trezor provider.
+   *
+   * @param to
+   * @returns Tx object, signature include.
+   */
+  async ethSignTypedData (params: any): Promise<string> {
+    this.#logger('🦄 attempting to sign typed data')
+    console.log('TODO IMPL TREZOR ')
+    this.#logger(params)
+    return undefined
+  }
 }

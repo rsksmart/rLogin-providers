@@ -65,6 +65,10 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
         return this.ethSendTransaction(params)
       }
 
+      case 'eth_signTypedData_v4': {
+        return this.ethSignTypedData(params)
+      }
+
       default:
         return new Promise((resolve, reject) => {
           this.provider.rpc.sendAsync({ method, params }, (err, data) => {
