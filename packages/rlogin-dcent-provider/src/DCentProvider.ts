@@ -87,7 +87,7 @@ export class DCentProvider extends RLoginEIP1193Provider {
     const messageHex = params[1]
     return await this.dcentProvider.send(
       'eth_sign',
-      [`0x${messageHex}`, params[0]]
+      [params[0], messageHex]
     )
   }
 
