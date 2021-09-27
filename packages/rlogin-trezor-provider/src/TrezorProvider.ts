@@ -1,7 +1,7 @@
 import TrezorConnect from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-import { EthSendTransactionParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
+import { EthSendTransactionParams, SignParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 
@@ -88,15 +88,23 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     return this
   }
 
-  async personalSign (params: PersonalSignParams, hex:boolean): Promise<string> {
+  private async validateAndSign (message: string, hex:boolean): Promise<string> {
     this.#validateIsConnected()
 
-    const result = await TrezorConnect.ethereumSignMessage({ path: this.path, message: params[0], hex })
+    const result = await TrezorConnect.ethereumSignMessage({ path: this.path, message, hex })
     if (result.success) {
       return result.payload.signature
     } else {
       throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
     }
+  }
+
+  personalSign (params: PersonalSignParams): Promise<string> {
+    return this.validateAndSign(params[0], false)
+  }
+
+  async sign (params: SignParams): Promise<string> {
+    return this.validateAndSign(params[1], true)
   }
 
   async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {

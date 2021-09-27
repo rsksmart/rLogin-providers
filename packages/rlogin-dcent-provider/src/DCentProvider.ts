@@ -65,14 +65,29 @@ export class DCentProvider extends RLoginEIP1193Provider {
    * @param message
    * @returns
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async personalSign (params: PersonalSignParams, hex: boolean): Promise<string> {
+  async personalSign (params: PersonalSignParams): Promise<string> {
     this.#validateIsConnected()
     this.#logger('🦄 attempting to sign message!')
     const messageHex = Buffer.from(params[0]).toString('hex')
     return await this.dcentProvider.send(
       'personal_sign',
       [`0x${messageHex}`, params[1]]
+    )
+  }
+
+  /**
+   * Sign personal message with Dcent.
+   *
+   * @param message
+   * @returns
+   */
+  async sign (params: PersonalSignParams): Promise<string> {
+    this.#validateIsConnected()
+    this.#logger('🦄 attempting to sign message!')
+    const messageHex = params[1]
+    return await this.dcentProvider.send(
+      'eth_sign',
+      [`0x${messageHex}`, params[0]]
     )
   }
 
