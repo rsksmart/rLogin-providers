@@ -114,12 +114,6 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     return this.validateConnectionAndSign(params[0])
   }
 
-  /**
-   * TODO Create sign typed data using Ledger provider.
-   *
-   * @param to
-   * @returns Tx object, signature include.
-   */
   async ethSignTypedData (params: SignParams): Promise<string> {
     this.#logger('🦄 attempting to sign typed data', params)
     const typedData = JSON.parse(params[1])

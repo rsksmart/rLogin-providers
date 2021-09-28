@@ -135,12 +135,6 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     }
   }
 
-  /**
-   * TODO Create sign typed data using Trezor provider.
-   *
-   * @param to
-   * @returns Tx object, signature include.
-   */
   ethSignTypedData (params: SignParams): Promise<string> {
     this.#logger('🦄 attempting to sign typed data.', params)
     const hashedMsg:string = getMessage(JSON.parse(params[1]), true).toString('hex')
