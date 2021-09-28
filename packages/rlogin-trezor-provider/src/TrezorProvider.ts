@@ -87,7 +87,6 @@ export class TrezorProvider extends RLoginEIP1193Provider {
       }
     }
 
-    console.log({ TrezorConnect })
     return this
   }
 
