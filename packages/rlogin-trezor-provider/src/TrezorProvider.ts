@@ -86,7 +86,6 @@ export class TrezorProvider extends RLoginEIP1193Provider {
         throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
       }
     }
-
     return this
   }
 
