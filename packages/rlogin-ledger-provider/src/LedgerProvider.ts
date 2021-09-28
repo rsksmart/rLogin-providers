@@ -7,6 +7,7 @@ import { PersonalSignParams, SignParams, EthSendTransactionParams } from '@rsksm
 import { RLoginEIP1193ProviderOptions, RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
+import { getStructHash } from 'eip-712'
 
 type LedgerProviderOptions = RLoginEIP1193ProviderOptions & {
   debug?: boolean
@@ -113,6 +114,26 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     return this.validateConnectionAndPersonalSign(params[0])
   }
 
+  /**
+   * TODO Create sign typed data using Ledger provider.
+   *
+   * @param to
+   * @returns Tx object, signature include.
+   */
+  async ethSignTypedData (params: SignParams): Promise<string> {
+    this.#logger('🦄 attempting to sign typed data', params)
+    const typedData = JSON.parse(params[1])
+    const domainSeparator = JSON.stringify(typedData.domain)
+    const hash = getStructHash(typedData, typedData.primaryType, typedData.message)
+    const result = await this.appEth.signEIP712HashedMessage(this.dpath, Buffer.from(domainSeparator).toString('hex'), Buffer.from(hash).toString('hex'))
+    const v = result.v - 27
+    let v2 = v.toString(16)
+    if (v2.length < 2) {
+      v2 = '0' + v
+    }
+    return `0x${result.r}${result.s}${v2}`
+  }
+
   async disconnect () {
     this.appEth.transport.close()
 
@@ -120,18 +141,5 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     this.appEthConnected = false
 
     this.appEth = null
-  }
-
-  /**
-   * TODO Create sign typed data using Ledger provider.
-   *
-   * @param to
-   * @returns Tx object, signature include.
-   */
-  async ethSignTypedData (params: any): Promise<string> {
-    this.#logger('🦄 attempting to sign typed data')
-    console.log('TODO IMPL LEDGER ')
-    this.#logger(params)
-    return undefined
   }
 }

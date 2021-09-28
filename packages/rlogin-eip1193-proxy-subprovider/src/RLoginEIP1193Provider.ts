@@ -33,6 +33,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
   abstract ethSendTransaction (params: EthSendTransactionParams): Promise<string>;
   abstract personalSign (params: PersonalSignParams): Promise<string>;
   abstract ethSign (params: SignParams): Promise<string>;
+  abstract ethSignTypedData (params: SignParams): Promise<string>;
 
   private validateSender (sender: string) {
     if (sender.toLowerCase() !== this.selectedAddress.toLowerCase()) throw new ProviderRpcError('The requested account has not been authorized by the user', 4100)

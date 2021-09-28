@@ -4,6 +4,7 @@ import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/r
 import { EthSendTransactionParams, SignParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
+import { getMessage } from 'eip-712'
 
 type TrezorOptions = {
   manifestEmail: string
@@ -140,10 +141,9 @@ export class TrezorProvider extends RLoginEIP1193Provider {
    * @param to
    * @returns Tx object, signature include.
    */
-  async ethSignTypedData (params: any): Promise<string> {
-    this.#logger('🦄 attempting to sign typed data')
-    console.log('TODO IMPL TREZOR ')
-    this.#logger(params)
-    return undefined
+  ethSignTypedData (params: SignParams): Promise<string> {
+    this.#logger('🦄 attempting to sign typed data.', params)
+    const hashedMsg:string = getMessage(JSON.parse(params[1]), true).toString('hex')
+    return this.validateConnectionAndSign(hashedMsg)
   }
 }
