@@ -32,7 +32,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
 
   abstract ethSendTransaction (params: EthSendTransactionParams): Promise<string>;
   abstract personalSign (params: PersonalSignParams): Promise<string>;
-  abstract sign (params: SignParams): Promise<string>;
+  abstract ethSign (params: SignParams): Promise<string>;
   abstract ethSignTypedData (params: SignParams): Promise<string>;
 
   private validateSender (sender: string) {
@@ -53,7 +53,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
 
       case 'eth_sign':
         this.validateSender(params[0])
-        return this.sign(params)
+        return this.ethSign(params)
 
       case 'personal_sign':
         this.validateSender(params[1])

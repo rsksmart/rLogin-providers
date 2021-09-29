@@ -104,7 +104,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     return this.validateConnectionAndSign(params[0])
   }
 
-  sign (params: SignParams): Promise<string> {
+  ethSign (params: SignParams): Promise<string> {
     return this.validateConnectionAndSign(params[1])
   }
 
