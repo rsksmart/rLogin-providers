@@ -1,11 +1,8 @@
 import DCentRPCProvider from 'dcent-provider'
-import DcentWebConnector from 'dcent-web-connector'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { EthSendTransactionParams, PersonalSignParams, SignParams } from '@rsksmart/rlogin-eip1193-types'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getMessage } from 'eip-712'
-
-const _ethereumKeyPath = "m/44'/60'/0'/0/0"
 
 export type DCentProviderOptions = RLoginEIP1193ProviderOptions & {
   dPath?: string
@@ -121,8 +118,21 @@ export class DCentProvider extends RLoginEIP1193Provider {
   async ethSignTypedData (params: SignParams): Promise<string> {
     this.#logger('🦄 attempting to sign typed data!')
     const hashedMsg = getMessage(JSON.parse(params[1]), true).toString('hex')
-    const result = await DcentWebConnector.getEthereumSignedMessage(hashedMsg, _ethereumKeyPath)
-    DcentWebConnector.popupWindowClose()
+
+    const result = await this.dcentProvider.send('eth_sign', [params[0], hashedMsg])
+    return result
+  }
+
+  /**
+   * Create personal sign typed data using Dcent provider.
+   *
+   * @param to
+   * @returns Tx object, signature include.
+   */
+  async personaSignTypedData (params: PersonalSignParams): Promise<string> {
+    this.#logger('🦄 attempting to personal sign typed data!')
+    const hashedMsg = getMessage(JSON.parse(params[0]), true).toString('hex')
+    const result = await this.dcentProvider.send('personal_sign', [params[1], hashedMsg])
     return result
   }
 }

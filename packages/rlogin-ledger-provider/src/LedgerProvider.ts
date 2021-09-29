@@ -128,18 +128,8 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     return `0x${result.r}${result.s}${v2}`
   }
 
-  async ethSignTypedData (params: SignParams): Promise<string> {
-    this.#logger('🦄 attempting to sign typed data', params)
-    const typedData = JSON.parse(params[1])
-    const domainSeparator = JSON.stringify(typedData.domain)
-    const hash = getStructHash(typedData, typedData.primaryType, typedData.message)
-    const result = await this.appEth.signEIP712HashedMessage(this.dpath, Buffer.from(domainSeparator).toString('hex'), Buffer.from(hash).toString('hex'))
-    const v = result.v - 27
-    let v2 = v.toString(16)
-    if (v2.length < 2) {
-      v2 = '0' + v
-    }
-    return `0x${result.r}${result.s}${v2}`
+  personaSignTypedData (params: PersonalSignParams): Promise<string> {
+    return this.validateConnectionAndPersonalSign(params[0])
   }
 
   async disconnect () {

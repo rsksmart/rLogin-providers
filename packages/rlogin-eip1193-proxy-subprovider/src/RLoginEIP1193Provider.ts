@@ -34,6 +34,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
   abstract personalSign (params: PersonalSignParams): Promise<string>;
   abstract ethSign (params: SignParams): Promise<string>;
   abstract ethSignTypedData (params: SignParams): Promise<string>;
+  abstract personaSignTypedData (params: PersonalSignParams): Promise<string>;
 
   private validateSender (sender: string) {
     if (sender.toLowerCase() !== this.selectedAddress.toLowerCase()) throw new ProviderRpcError('The requested account has not been authorized by the user', 4100)
@@ -68,6 +69,10 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
 
       case 'eth_signTypedData_v4': {
         return this.ethSignTypedData(params)
+      }
+
+      case 'personal_signTypedData': {
+        return this.personaSignTypedData(params)
       }
 
       default:

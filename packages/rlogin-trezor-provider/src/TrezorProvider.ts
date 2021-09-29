@@ -140,4 +140,16 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     const hashedMsg:string = getMessage(JSON.parse(params[1]), true).toString('hex')
     return this.validateConnectionAndSign(hashedMsg)
   }
+
+  /**
+   * Create personal sign typed data using Trezor provider.
+   *
+   * @param to
+   * @returns Tx object, signature include.
+   */
+  async personaSignTypedData (params: PersonalSignParams): Promise<string> {
+    this.#logger('🦄 attempting to personal sign typed data.', params)
+    const hashedMsg:string = getMessage(JSON.parse(params[0]), true).toString('hex')
+    return this.validateConnectionAndSign(hashedMsg)
+  }
 }
