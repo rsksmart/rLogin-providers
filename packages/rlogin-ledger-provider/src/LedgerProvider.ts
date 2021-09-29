@@ -3,7 +3,7 @@ import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
 import { signTransaction, convertFromHex } from './helpers'
-import { PersonalSignParams, SignParams, EthSendTransactionParams } from '@rsksmart/rlogin-eip1193-types'
+import { PersonalSignParams, SignParams, EthSendTransactionParams, SignTypedDataParams } from '@rsksmart/rlogin-eip1193-types'
 import { RLoginEIP1193ProviderOptions, RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
@@ -114,9 +114,9 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     return this.validateConnectionAndPersonalSign(params[0])
   }
 
-  async ethSignTypedData (params: SignParams): Promise<string> {
+  async ethSignTypedData (params: SignTypedDataParams): Promise<string> {
     this.#logger('🦄 attempting to sign typed data', params)
-    const typedData = JSON.parse(params[1])
+    const typedData = params[1]
     const domainSeparator = JSON.stringify(typedData.domain)
     const hash = getStructHash(typedData, typedData.primaryType, typedData.message)
     const result = await this.appEth.signEIP712HashedMessage(this.dpath, Buffer.from(domainSeparator).toString('hex'), Buffer.from(hash).toString('hex'))

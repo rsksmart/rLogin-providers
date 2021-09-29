@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/rsksmart/rLogin-providers#readme",
   "dependencies": {
+    "eip-712": "^0.4.3",
     "ethjs-provider-http": "^0.1.6",
     "ethjs-query": "^0.3.8"
   }

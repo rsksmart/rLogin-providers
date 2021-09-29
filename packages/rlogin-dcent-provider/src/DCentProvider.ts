@@ -1,6 +1,6 @@
 import DCentRPCProvider from 'dcent-provider'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-import { EthSendTransactionParams, PersonalSignParams, SignParams } from '@rsksmart/rlogin-eip1193-types'
+import { EthSendTransactionParams, PersonalSignParams, SignTypedDataParams } from '@rsksmart/rlogin-eip1193-types'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getMessage } from 'eip-712'
 
@@ -115,10 +115,9 @@ export class DCentProvider extends RLoginEIP1193Provider {
    * @param to
    * @returns Tx object, signature include.
    */
-  async ethSignTypedData (params: SignParams): Promise<string> {
+  async ethSignTypedData (params: SignTypedDataParams): Promise<string> {
     this.#logger('🦄 attempting to sign typed data!')
-    const hashedMsg = getMessage(JSON.parse(params[1]), true).toString('hex')
-
+    const hashedMsg = getMessage(params[1], true).toString('hex')
     const result = await this.dcentProvider.send('eth_sign', [params[0], hashedMsg])
     return result
   }

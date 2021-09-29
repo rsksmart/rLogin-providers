@@ -1,7 +1,7 @@
 import TrezorConnect from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-import { EthSendTransactionParams, SignParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
+import { EthSendTransactionParams, SignParams, PersonalSignParams, SignTypedDataParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getMessage } from 'eip-712'
@@ -135,9 +135,9 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     }
   }
 
-  ethSignTypedData (params: SignParams): Promise<string> {
+  ethSignTypedData (params: SignTypedDataParams): Promise<string> {
     this.#logger('🦄 attempting to sign typed data.', params)
-    const hashedMsg:string = getMessage(JSON.parse(params[1]), true).toString('hex')
+    const hashedMsg:string = getMessage(params[1], true).toString('hex')
     return this.validateConnectionAndSign(hashedMsg)
   }
 

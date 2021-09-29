@@ -1,3 +1,5 @@
+import { TypedData } from 'eip-712'
+
 export type Transaction = {
     to: string
     from?: string
@@ -11,6 +13,7 @@ export type Transaction = {
 export type EthSendTransactionParams = [transaction: Transaction]
 export type PersonalSignParams = [data: string, account: string]
 export type SignParams = [account: string, data: string]
+export type SignTypedDataParams = [account: string, data: TypedData]
 
 export interface IRLoginEIP1193Provider {
     request(args: { method: 'net_version' }): Promise<string>

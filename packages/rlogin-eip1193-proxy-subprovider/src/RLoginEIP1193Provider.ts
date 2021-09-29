@@ -1,6 +1,6 @@
 import HttpProvider from 'ethjs-provider-http'
 import Eth from 'ethjs-query'
-import { IRLoginEIP1193Provider, EthSendTransactionParams, PersonalSignParams, SignParams } from '@rsksmart/rlogin-eip1193-types'
+import { IRLoginEIP1193Provider, EthSendTransactionParams, PersonalSignParams, SignParams, SignTypedDataParams } from '@rsksmart/rlogin-eip1193-types'
 
 export type RLoginEIP1193ProviderOptions = { rpcUrl: string, chainId: number }
 
@@ -33,7 +33,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
   abstract ethSendTransaction (params: EthSendTransactionParams): Promise<string>;
   abstract personalSign (params: PersonalSignParams): Promise<string>;
   abstract ethSign (params: SignParams): Promise<string>;
-  abstract ethSignTypedData (params: SignParams): Promise<string>;
+  abstract ethSignTypedData (params: SignTypedDataParams): Promise<string>;
   abstract personaSignTypedData (params: PersonalSignParams): Promise<string>;
 
   private validateSender (sender: string) {
