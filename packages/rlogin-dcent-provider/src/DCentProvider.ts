@@ -81,7 +81,7 @@ export class DCentProvider extends RLoginEIP1193Provider {
    * @param message
    * @returns
    */
-  async sign (params: PersonalSignParams): Promise<string> {
+  async ethSign (params: PersonalSignParams): Promise<string> {
     this.#validateIsConnected()
     this.#logger('🦄 attempting to sign message!')
     const messageHex = params[1]

@@ -92,7 +92,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   }
 
   // reference: https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth#signpersonalmessage
-  private async validateConnectionAndSign (hexMessage: string): Promise<string> {
+  private async validateConnectionAndPersonalSign (hexMessage: string): Promise<string> {
     this.#validateIsConnected()
     const message = convertFromHex(hexMessage)
     const result = await this.appEth.signPersonalMessage(this.dpath, Buffer.from(message).toString('hex'))
@@ -105,12 +105,12 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     return `0x${result.r}${result.s}${v2}`
   }
 
-  sign (params: SignParams): Promise<string> {
-    return this.validateConnectionAndSign(params[1])
+  ethSign (params: SignParams): Promise<string> {
+    return this.validateConnectionAndPersonalSign(params[1])
   }
 
   personalSign (params: PersonalSignParams): Promise<string> {
-    return this.validateConnectionAndSign(params[0])
+    return this.validateConnectionAndPersonalSign(params[0])
   }
 
   async disconnect () {
