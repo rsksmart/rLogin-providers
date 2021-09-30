@@ -2,8 +2,8 @@ import TransportWebHID from '@ledgerhq/hw-transport-webhid'
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import AppEth from '@ledgerhq/hw-app-eth'
 import Transport from '@ledgerhq/hw-transport'
-import { signTransaction } from './helpers'
-import { PersonalSignParams, EthSendTransactionParams } from '@rsksmart/rlogin-eip1193-types'
+import { signTransaction, convertFromHex } from './helpers'
+import { PersonalSignParams, SignParams, EthSendTransactionParams } from '@rsksmart/rlogin-eip1193-types'
 import { RLoginEIP1193ProviderOptions, RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
@@ -92,10 +92,10 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   }
 
   // reference: https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth#signpersonalmessage
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async personalSign (params: PersonalSignParams, hex:boolean): Promise<string> {
+  private async validateConnectionAndPersonalSign (hexMessage: string): Promise<string> {
     this.#validateIsConnected()
-    const result = await this.appEth.signPersonalMessage(this.dpath, Buffer.from(params[0]).toString('hex'))
+    const message = convertFromHex(hexMessage)
+    const result = await this.appEth.signPersonalMessage(this.dpath, Buffer.from(message).toString('hex'))
     const v = result.v - 27
     let v2 = v.toString(16)
     if (v2.length < 2) {
@@ -103,6 +103,14 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     }
 
     return `0x${result.r}${result.s}${v2}`
+  }
+
+  ethSign (params: SignParams): Promise<string> {
+    return this.validateConnectionAndPersonalSign(params[1])
+  }
+
+  personalSign (params: PersonalSignParams): Promise<string> {
+    return this.validateConnectionAndPersonalSign(params[0])
   }
 
   async disconnect () {

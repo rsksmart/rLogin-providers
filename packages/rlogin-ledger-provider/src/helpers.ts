@@ -33,3 +33,10 @@ export const signTransaction = (
       return new Transaction(txData).serialize().toString('hex')
     })
 }
+
+// converts hex string '0x...' to utf string
+export function convertFromHex (hex:string) {
+  let str:string = ''
+  for (let i = 2; i < hex.length; i += 2) { str += String.fromCharCode(parseInt(hex.substr(i, 2), 16)) }
+  return str
+}
