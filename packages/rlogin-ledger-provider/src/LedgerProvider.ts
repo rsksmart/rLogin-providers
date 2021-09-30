@@ -7,7 +7,7 @@ import { PersonalSignParams, SignParams, EthSendTransactionParams, SignTypedData
 import { RLoginEIP1193ProviderOptions, RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
-import { getStructHash } from 'eip-712'
+import { getStructHash, TypedData } from 'eip-712'
 
 type LedgerProviderOptions = RLoginEIP1193ProviderOptions & {
   debug?: boolean
@@ -116,7 +116,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
 
   async ethSignTypedData (params: SignTypedDataParams): Promise<string> {
     this.#logger('🦄 attempting to sign typed data', params)
-    const typedData = params[1]
+    const typedData: TypedData = (typeof params[1] === 'string') ? (JSON.parse(params[1]) as TypedData) : params[1]
     const domainSeparator = JSON.stringify(typedData.domain)
     const hash = getStructHash(typedData, typedData.primaryType, typedData.message)
     const result = await this.appEth.signEIP712HashedMessage(this.dpath, Buffer.from(domainSeparator).toString('hex'), Buffer.from(hash).toString('hex'))

@@ -13,7 +13,7 @@ export type Transaction = {
 export type EthSendTransactionParams = [transaction: Transaction]
 export type PersonalSignParams = [data: string, account: string]
 export type SignParams = [account: string, data: string]
-export type SignTypedDataParams = [account: string, data: TypedData]
+export type SignTypedDataParams = [account: string, data: TypedData | string]
 
 export interface IRLoginEIP1193Provider {
     request(args: { method: 'net_version' }): Promise<string>
