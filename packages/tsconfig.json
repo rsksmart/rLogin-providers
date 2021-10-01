@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+      { "path": "rlogin-eip1193-proxy-subprovider" },
+      { "path": "rlogin-eip1193-types" },
+      { "path": "rlogin-trezor-provider" },
+      { "path": "rlogin-ledger-provider" },
+      { "path": "rlogin-dcent-provider" },
+      { "path": "rlogin-transactions" },
+      { "path": "rlogin-dpath" }
+
+  ]
+}

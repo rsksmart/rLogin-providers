@@ -1,0 +1,16 @@
+# npm
+node_modules
+
+# ts
+tsconfig.tsbuildinfo
+lib
+
+# webpack
+dist
+
+# jest
+reports
+junit.xml
+coverage
+
+*.DS_Store

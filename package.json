@@ -1,0 +1,32 @@
+{
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "link": "npx lerna link",
+    "setup": "npx lerna bootstrap",
+    "build": "npx lerna run build",
+    "test": "npx jest packages/*/test --verbose --coverage --collectCoverageFrom=packages/*/src/**/*",
+    "lint": "npx eslint ./packages --ext .json,.js,.ts",
+    "lint:fix": "npx eslint ./packages --ext .json,.js,.ts --fix"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "eslint": "^7.26.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-json": "^3.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "jest": "^26.6.3",
+    "jest-junit": "^12.2.0",
+    "lerna": "^4.0.0",
+    "ts-jest": "^26.5.6",
+    "ts-loader": "^9.1.2",
+    "typescript": "^4.2.4",
+    "webpack": "^5.52.0",
+    "webpack-cli": "^4.7.2"
+  }
+}
