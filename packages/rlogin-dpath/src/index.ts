@@ -1,6 +1,6 @@
 export const getDPathByChainId = (chainId: number): string => {
   switch (chainId) {
-    case 30: return "44'/137'/0'/0/0"
+    case 30: return "m/44'/137'/0'/0/0"
     case 31:
     case 1:
     case 3:
