@@ -1,6 +1,6 @@
 /**
- * Get the BIP-44 first account derivation path for a given network. The network
- * is the return value for RPC eth_chainID
+ * Get the BIP-44 account derivation path for a given network and index. The network
+ * is the return value for RPC eth_chainId
  * Standards:
  * - BIP-44: https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
  * - SLIP-44: https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -8,6 +8,7 @@
  * - EIP-155: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md
  * - EIP-695: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-695.md
  * @param chainId EIP-155 chain Id
+ * @param index derive different accounts based on SLIP-44
  * @param isLedger use it for RSK Testnet and Ledger
  * @returns the first account of standard BIP-44 derviation path forthe given network
  */
