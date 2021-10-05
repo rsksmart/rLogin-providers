@@ -28,7 +28,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
 
     this.debug = !!debug
 
-    this.dpath = dPath || getDPathByChainId(chainId)
+    this.dpath = dPath || getDPathByChainId(chainId, 0, true)
   }
 
   /**
