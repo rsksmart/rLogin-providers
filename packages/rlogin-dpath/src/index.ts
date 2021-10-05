@@ -19,9 +19,9 @@ export const getDPathByChainId = (chainId: number, index: number = 0, isLedger =
     case 30: return `m/44'/137'/0'/0/${index}` // RSK Mainnet - based on rskip-57
     case 31: return `m/44'/37310'/0'/0/${index}` // RSK Testnet - based on rskip-57
     case 1: return `m/44'/60'/0'/0/${index}` // Ethereum Mainnet - based on eip-155 and slip-44
-    case 3:	// Ropsten
-    case 4:	// Rinkeby
-    case 5:	// Goerli
+    case 3:// Ropsten
+    case 4:// Rinkeby
+    case 5:// Goerli
     case 42: // Kovan
       return `m/44'/1'/0'/0/${index}` // Ethereum testnets - based on eip-155 and slip-44
     default: throw new Error('Network not supported please specify the derivation path')
