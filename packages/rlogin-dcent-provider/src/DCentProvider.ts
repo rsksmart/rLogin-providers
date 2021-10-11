@@ -1,4 +1,5 @@
-import DCentRPCProvider from 'dcent-provider'
+import DCentRPCProvider from '@rsksmart/dcent-provider'
+import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { EthSendTransactionParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
@@ -26,12 +27,13 @@ export class DCentProvider extends RLoginEIP1193Provider {
     super({ rpcUrl, chainId })
 
     this.#debug = debug
-    this.path = dPath
+    this.path = dPath || getDPathByChainId(chainId)
     this.rpcUrl = rpcUrl
 
     this.dcentProvider = new DCentRPCProvider({
       rpcUrl: this.rpcUrl,
-      chainId: this.chainId
+      chainId: this.chainId,
+      dpath: this.path
     })
   }
 
