@@ -7,9 +7,9 @@
 	"files": [
 		"dist/"
 	],
-  "scripts": {
-    "build": "npx webpack"
-  },
+	"scripts": {
+		"build": "npx webpack"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/rsksmart/rLogin-providers.git"
@@ -28,17 +28,18 @@
 	},
 	"homepage": "https://github.com/rsksmart/rLogin-providers#readme",
 	"dependencies": {
-    "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.8",
-    "@rsksmart/rlogin-transactions": "^1.0.0-beta.7",
-    "@rsksmart/rlogin-dpath": "^1.0.0-beta.7",
+		"@rsksmart/rlogin-dpath": "^1.0.0-beta.7",
+		"@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.0-beta.8",
+		"@rsksmart/rlogin-transactions": "^1.0.0-beta.7",
 		"assert": "^2.0.0",
 		"buffer": "^6.0.3",
 		"dcent-provider": "^0.3.0-beta",
-    "url": "^0.11.0",
-    "util": "^0.12.4",
-		"stream-browserify": "^3.0.0"
-  },
-  "devDependencies": {
-    "@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.7"
+		"eip-712": "^0.4.3",
+		"stream-browserify": "^3.0.0",
+		"url": "^0.11.0",
+		"util": "^0.12.4"
+	},
+	"devDependencies": {
+		"@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.7"
 	}
 }

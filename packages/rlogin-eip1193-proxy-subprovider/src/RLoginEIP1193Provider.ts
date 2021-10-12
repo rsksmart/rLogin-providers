@@ -1,6 +1,6 @@
 import HttpProvider from 'ethjs-provider-http'
 import Eth from 'ethjs-query'
-import { IRLoginEIP1193Provider, EthSendTransactionParams, PersonalSignParams, SignParams } from '@rsksmart/rlogin-eip1193-types'
+import { IRLoginEIP1193Provider, EthSendTransactionParams, PersonalSignParams, SignParams, SignTypedDataParams } from '@rsksmart/rlogin-eip1193-types'
 
 export type RLoginEIP1193ProviderOptions = { rpcUrl: string, chainId: number }
 
@@ -33,6 +33,8 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
   abstract ethSendTransaction (params: EthSendTransactionParams): Promise<string>;
   abstract personalSign (params: PersonalSignParams): Promise<string>;
   abstract ethSign (params: SignParams): Promise<string>;
+  abstract ethSignTypedData (params: SignTypedDataParams): Promise<string>;
+  abstract personaSignTypedData (params: PersonalSignParams): Promise<string>;
 
   private validateSender (sender: string) {
     if (sender.toLowerCase() !== this.selectedAddress.toLowerCase()) throw new ProviderRpcError('The requested account has not been authorized by the user', 4100)
@@ -63,6 +65,14 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
         if (from) this.validateSender((params as EthSendTransactionParams)[0].from)
         else params[0].from = this.selectedAddress
         return this.ethSendTransaction(params)
+      }
+
+      case 'eth_signTypedData_v4': {
+        return this.ethSignTypedData(params)
+      }
+
+      case 'personal_signTypedData': {
+        return this.personaSignTypedData(params)
       }
 
       default:

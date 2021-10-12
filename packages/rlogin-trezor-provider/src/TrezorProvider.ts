@@ -1,9 +1,10 @@
 import TrezorConnect from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-import { EthSendTransactionParams, SignParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
+import { EthSendTransactionParams, SignParams, PersonalSignParams, SignTypedDataParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
+import { getMessage, TypedData } from 'eip-712'
 
 type TrezorOptions = {
   manifestEmail: string
@@ -70,7 +71,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
         })
         this.initialized = true
       } catch (e) {
-        throw new Error(this.#handleTrezorError(e.message))
+        console.log(e)
       }
     }
 
@@ -132,5 +133,31 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     } else {
       throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
     }
+  }
+
+  ethSignTypedData (params: SignTypedDataParams): Promise<string> {
+    this.#logger('🦄 attempting to sign typed data.', params)
+    const parsed: TypedData = (typeof params[1] === 'string') ? (JSON.parse(params[1]) as TypedData) : params[1]
+    const hashedMsg:string = getMessage(parsed, true).toString('hex')
+    return this.validateConnectionAndSign(hashedMsg)
+  }
+
+  /**
+   * Create personal sign typed data using Trezor provider.
+   *
+   * @param to
+   * @returns Tx object, signature include.
+   */
+  async personaSignTypedData (params: PersonalSignParams): Promise<string> {
+    this.#logger('🦄 attempting to personal sign typed data.', params)
+    const hashedMsg:string = getMessage(JSON.parse(params[0]), true).toString('hex')
+    return this.validateConnectionAndSign(hashedMsg)
+  }
+
+  disconnect () {
+    this.#logger('🦄 disconnecting device.')
+    TrezorConnect.dispose()
+    this.connected = false
+    this.selectedAddress = null
   }
 }
