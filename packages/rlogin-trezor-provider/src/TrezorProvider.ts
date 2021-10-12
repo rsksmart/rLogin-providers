@@ -71,7 +71,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
         })
         this.initialized = true
       } catch (e) {
-        throw new Error(this.#handleTrezorError(e.message))
+        console.log(e)
       }
     }
 
@@ -152,5 +152,12 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     this.#logger('🦄 attempting to personal sign typed data.', params)
     const hashedMsg:string = getMessage(JSON.parse(params[0]), true).toString('hex')
     return this.validateConnectionAndSign(hashedMsg)
+  }
+
+  disconnect () {
+    this.#logger('🦄 disconnecting device.')
+    TrezorConnect.dispose()
+    this.connected = false
+    this.selectedAddress = null
   }
 }
