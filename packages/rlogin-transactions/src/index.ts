@@ -7,6 +7,7 @@ export type CompleteTx = {
   data: string
   value: string | number
   gasLimit: number
+  gas: number
   gasPrice: number
 }
 
@@ -27,7 +28,7 @@ export const createTransaction = async (provider: any, from: string, tx: Transac
     gasPrice: tx.gasPrice || await provider.gasPrice().then(r => Math.floor(r.toNumber() * 1.01))
   }
 
-  finalTx.gasLimit = tx.gasLimit || await provider.estimateGas(finalTx)
+  finalTx.gasLimit = tx.gas || await provider.estimateGas(finalTx)
 
   return finalTx as CompleteTx
 }

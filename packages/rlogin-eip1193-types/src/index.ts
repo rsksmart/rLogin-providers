@@ -5,6 +5,7 @@ export type Transaction = {
     data?: string
     value?: string | number
     gasLimit?: number
+    gas?: number
     gasPrice?: number
 }
 
