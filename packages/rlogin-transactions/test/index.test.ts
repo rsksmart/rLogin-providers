@@ -33,6 +33,7 @@ describe('createTransaction', () => {
       tx.from,
       {
         ...tx,
+        // @ts-ignore
         gas: 12000
       }
     )
