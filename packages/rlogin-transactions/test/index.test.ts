@@ -27,7 +27,7 @@ describe('createTransaction', () => {
     })
   })
 
-  test('can pass gas property' , async () => {
+  test('can pass gas property', async () => {
     const result = await createTransaction(
       provider,
       tx.from,
