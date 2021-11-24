@@ -25,7 +25,7 @@ Internals:
 
 ## Run for development
 
-Firs, install all dependencies and link packages
+First, install all dependencies and link packages
 
 ```
 npm i

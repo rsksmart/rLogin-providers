@@ -1,6 +1,6 @@
 {
 	"name": "@rsksmart/rlogin-dcent-provider",
-	"version": "1.0.1",
+	"version": "1.0.2-beta.1",
 	"description": "rLogin - D'cent EIP-1193 provider",
 	"main": "dist/bundle.js",
 	"types": "dist/index.d.ts",
@@ -31,7 +31,7 @@
 		"@rsksmart/dcent-provider": "^0.3.0-beta",
 		"@rsksmart/rlogin-dpath": "^1.0.1",
 		"@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.1",
-		"@rsksmart/rlogin-transactions": "^1.0.1",
+		"@rsksmart/rlogin-transactions": "^1.0.2-beta.1",
 		"assert": "^2.0.0",
 		"buffer": "^6.0.3",
 		"stream-browserify": "^3.0.0",

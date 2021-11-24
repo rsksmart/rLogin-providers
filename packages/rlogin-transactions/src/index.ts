@@ -19,6 +19,7 @@ export type CompleteTx = {
  */
 export const createTransaction = async (provider: any, from: string, tx: Transaction): Promise<CompleteTx> => {
   const finalTx: Partial<CompleteTx> = {
+    ...tx,
     from: from.toLowerCase(),
     to: tx.to.toLowerCase(),
     nonce: tx.nonce || await provider.getTransactionCount(from).then(r => r.toNumber()),
