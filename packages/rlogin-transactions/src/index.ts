@@ -26,7 +26,7 @@ const parseOrEstimateGas = async (provider: any, tx: ClientTxOptions, finalTx: P
 const toNumber = (v: number | any) => typeof v === 'number' ? v : Number(v)
 
 const parseValue = (value: Transaction['value'] | undefined) => {
-  if (!value) return '0x'
+  if (!value) return '0x00'
   if (typeof value == 'string' && value.slice(0, 2) === '0x') return value
   return '0x' + new BN(value).toString(16)
 }

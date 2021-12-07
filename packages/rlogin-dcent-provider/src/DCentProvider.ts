@@ -1,7 +1,7 @@
 import DCentRPCProvider from '@rsksmart/dcent-provider'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
-import { EthSendTransactionParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
+import { EthSendTransactionParams, PersonalSignParams, Transaction } from '@rsksmart/rlogin-eip1193-types'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 
 export type DCentProviderOptions = RLoginEIP1193ProviderOptions & {
@@ -104,7 +104,11 @@ export class DCentProvider extends RLoginEIP1193Provider {
   async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {
     this.#validateIsConnected()
 
-    const transaction = await createTransaction(this.provider, this.selectedAddress!, params[0])
+    const transaction: Transaction & { gas?: Transaction['gasLimit'] } = await createTransaction(this.provider, this.selectedAddress!, params[0])
+
+    // Ref: https://github.com/DcentWallet/dcent-provider/blob/a0be498c41efb6657a299379a37eed07dbb5eee1/example/src/components/DemoFunction.vue#L119
+    transaction.gas = transaction.gasLimit
+    delete transaction.gasLimit
 
     this.#logger('🦄 attempting to send tx!')
     return await this.dcentProvider.send('eth_sendTransaction', transaction)
