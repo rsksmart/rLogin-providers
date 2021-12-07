@@ -2,49 +2,112 @@ import { Transaction } from '@rsksmart/rlogin-eip1193-types'
 import { createTransaction } from '../src/index'
 import BN from 'bn.js'
 
+const from = '0x987654321'
+const to = '0x123456789'
+
+const basicTx: Transaction = { from, to }
+
+const mockTransactionCount = 5
+const mockGasPrice = 10000
+const mockEstimateGas = 35000
+
+const mockProvider = {
+  getTransactionCount: () => Promise.resolve(new BN(mockTransactionCount)),
+  gasPrice: () => Promise.resolve(new BN(mockGasPrice)),
+  estimateGas: () => Promise.resolve(mockEstimateGas)
+}
+
 describe('createTransaction', () => {
-  const provider = {
-    getTransactionCount: () => Promise.resolve(new BN(5)),
-    gasPrice: () => Promise.resolve(new BN(10000)),
-    estimateGas: () => Promise.resolve(35000)
-  }
+  test('transaction with estimations', async () => {
+    const result = await createTransaction(mockProvider, basicTx.from, basicTx)
 
-  const tx: Transaction = {
-    to: '0x123456789',
-    from: '0x987654321',
-    value: '10000'
-  }
+    const expectedEstimatedTx: Transaction = {
+      ...basicTx,
+      value: '0x00',
+      data: '0x',
+      nonce: mockTransactionCount,
+      gasPrice: mockGasPrice * 1.01,
+      gasLimit: mockEstimateGas
+    }
 
-  test('standard transaction', async () => {
-    const result = await createTransaction(provider, tx.from, tx)
-    expect(result).toMatchObject({
-      ...tx,
-      data: '0x0',
-      value: '0x2710',
-      gasLimit: 35000,
-      gasPrice: 10100,
-      nonce: 5
+    expect(result).toMatchObject(expectedEstimatedTx)
+  })
+
+  test('complete transaction', async () => {
+    const completeTx: Transaction = {
+      ...basicTx,
+      value: '0x1010',
+      data: '0xabcd',
+      nonce: 10,
+      gasPrice: 1000,
+      gasLimit: 2000
+    }
+
+    const result = await createTransaction(mockProvider, completeTx.from, completeTx)
+
+    expect(result).toMatchObject(completeTx)
+  })
+
+  describe('value to hex string', () => {
+    test('already hex', async () => {
+      const tx = {
+        ...basicTx,
+        value: '0xabcd'
+      }
+
+      const result = await createTransaction(mockProvider, from, tx)
+
+      expect(result.value).toEqual('0xabcd')
+    })
+
+    test('base 10 string to hex string', async () => {
+      const tx = {
+        ...basicTx,
+        value: '10000'
+      }
+
+      const result = await createTransaction(mockProvider, from, tx)
+
+      expect(result.value).toEqual('0x2710')
+    })
+
+    test('number to hex string', async () => {
+      const tx = {
+        ...basicTx,
+        value: 10000
+      }
+
+      const result = await createTransaction(mockProvider, from, tx)
+
+      expect(result.value).toEqual('0x2710')
     })
   })
 
-  test('can pass gas property', async () => {
-    const result = await createTransaction(
-      provider,
-      tx.from,
-      {
-        ...tx,
-        // @ts-ignore
-        gas: 12000
+  describe('estimate gas', () => {
+    const customGasLimit = 12000
+
+    test('can pass gas property', async () => {
+      const tx = {
+        ...basicTx,
+        gas: customGasLimit
       }
-    )
-    expect(result).toMatchObject({
-      ...tx,
-      gas: 12000,
-      data: '0x0',
-      value: '0x2710',
-      gasLimit: 35000,
-      gasPrice: 10100,
-      nonce: 5
+
+      const result = await createTransaction(mockProvider, from, tx)
+
+      expect(result.gasLimit).toEqual(customGasLimit)
+      expect((result as any).gas).toBeUndefined()
+    })
+
+    test('can pass gasLimit property', async () => {
+      const tx = {
+        ...basicTx,
+        gasLimit: customGasLimit
+      }
+
+      const result = await createTransaction(mockProvider, from, tx)
+
+      expect(result.gasLimit).toEqual(customGasLimit)
+      expect((result as any).gas).toBeUndefined()
     })
   })
 })

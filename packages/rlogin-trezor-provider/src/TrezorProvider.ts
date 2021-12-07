@@ -15,6 +15,8 @@ export type TrezorProviderOptions = RLoginEIP1193ProviderOptions & TrezorOptions
   dPath?: string
 }
 
+const convertToHex = (v: string | number) => typeof v === 'string' && v.slice(0, 2) === '0x' ? v : `0x${v.toString(16)}`
+
 export class TrezorProvider extends RLoginEIP1193Provider {
   public readonly isTrezor = true
 
@@ -113,11 +115,13 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     const transaction = await createTransaction(this.provider, this.selectedAddress!, params[0])
     const tx = {
       ...transaction,
-      nonce: `0x${transaction.nonce.toString(16)}`,
-      gasPrice: `0x${transaction.gasPrice.toString(16)}`,
-      gasLimit: `0x${transaction.gasLimit.toString(16)}`,
+      nonce: convertToHex(transaction.nonce),
+      gasPrice: convertToHex(transaction.gasPrice),
+      gasLimit: convertToHex(transaction.gasLimit),
       chainId: this.chainId
     }
+
+    console.log(tx)
     const result = await TrezorConnect.ethereumSignTransaction({
       path: this.path,
       transaction: tx
