@@ -44,7 +44,7 @@ export abstract class RLoginEIP1193Provider implements IRLoginEIP1193Provider {
     switch (method) {
       case 'eth_accounts':
       case 'eth_requestAccounts':
-        return [this.selectedAddress]
+        return [this.selectedAddress.toLowerCase()]
 
       case 'eth_chainId':
       case 'net_version':
