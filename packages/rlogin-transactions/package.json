@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/rsksmart/rLogin-providers#readme",
   "devDependencies": {
-    "@rsksmart/rlogin-eip1193-types": "^1.0.1"
+    "@rsksmart/rlogin-eip1193-types": "^1.0.1-beta.1"
   },
   "dependencies": {
     "bn.js": "^5.2.0"
