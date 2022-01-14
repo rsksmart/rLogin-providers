@@ -73,15 +73,34 @@ export class LedgerProvider extends RLoginEIP1193Provider {
       transport = await TransportWebUSB.create()
     }
 
+    this.appEth = new AppEth(transport)
+    this.appEthConnected = true
+
+    // select the path in the constructor
+    return this.chooseAccount(this.dpath)
+  }
+
+  // Choose an account from the derivation path
+  async chooseAccount (dpath: string): Promise<RLoginEIP1193Provider> {
     try {
-      this.appEth = new AppEth(transport)
-      this.appEthConnected = true
-      const result = await this.appEth.getAddress(this.dpath)
+      const result = await this.appEth.getAddress(dpath)
       this.selectedAddress = result.address
+      this.dpath = dpath
       return this
     } catch (error) {
       throw new Error(this.#handleLedgerError(error))
     }
+  }
+
+  // note: ledger can only get one address at a time, so Promise.all will result in a thrown error
+  async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
+    return indexes.reduce((lastProm, index) => lastProm.then(
+      (resultArrSoFar) => {
+        const path = getDPathByChainId(this.chainId, index, true)
+        return this.appEth.getAddress(path, false)
+          .then(result => [...resultArrSoFar, { path, address: result.address }])
+      }
+    ), Promise.resolve([]))
   }
 
   async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {
