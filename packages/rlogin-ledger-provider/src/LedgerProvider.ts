@@ -96,9 +96,9 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
     return indexes.reduce((lastProm, index) => lastProm.then(
       (resultArrSoFar) => {
-        const path = getDPathByChainId(this.chainId, index, true)
-        return this.appEth.getAddress(path, false)
-          .then(result => [...resultArrSoFar, { path, address: result.address }])
+        const dPath = getDPathByChainId(this.chainId, index, true)
+        return this.appEth.getAddress(dPath, false)
+          .then(result => [...resultArrSoFar, { dPath, address: result.address }])
       }
     ), Promise.resolve([]))
   }
