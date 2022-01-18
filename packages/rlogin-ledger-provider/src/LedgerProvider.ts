@@ -50,6 +50,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     switch (err.message) {
       case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return 'Unlock the device to connect.'
       case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return 'Navigate to the correct app (Ethereum or RSK Mainnet) in the Ledger.'
+      case 'Ledger device: UNKNOWN_ERROR (0x6511)': return 'Open up the correct app in the Ledger.' // no app selected
       // unknown error
       default: return err.message
     }
