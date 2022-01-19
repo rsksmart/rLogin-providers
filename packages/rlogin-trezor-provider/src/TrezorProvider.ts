@@ -76,9 +76,13 @@ export class TrezorProvider extends RLoginEIP1193Provider {
       }
     }
 
+    return this.chooseAccount(this.path)
+  }
+
+  async chooseAccount (dpath: string): Promise<RLoginEIP1193Provider> {
     if (!this.connected) {
-      console.log('🦄 attempting to connect!')
-      const result = await TrezorConnect.ethereumGetAddress({ path: this.path, showOnTrezor: false })
+      this.#logger('🦄 attempting to connect!')
+      const result = await TrezorConnect.ethereumGetAddress({ path: dpath, showOnTrezor: false })
 
       if (result.success) {
         this.connected = true
@@ -88,6 +92,20 @@ export class TrezorProvider extends RLoginEIP1193Provider {
       }
     }
     return this
+  }
+
+  async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
+    const bundle = indexes.map((index) => ({
+      path: getDPathByChainId(this.chainId, index),
+      showOnTrezor: false
+    }))
+
+    return TrezorConnect.ethereumGetAddress({ bundle })
+      .then((results) => results.payload)
+      .then((accounts: any) => accounts.map((account: any) => ({
+        dPath: account.serializedPath,
+        address: account.address
+      })))
   }
 
   private async validateConnectionAndSign (message: string): Promise<string> {
@@ -121,7 +139,6 @@ export class TrezorProvider extends RLoginEIP1193Provider {
       chainId: this.chainId
     }
 
-    console.log(tx)
     const result = await TrezorConnect.ethereumSignTransaction({
       path: this.path,
       transaction: tx
