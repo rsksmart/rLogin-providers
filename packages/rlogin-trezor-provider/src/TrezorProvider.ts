@@ -72,6 +72,10 @@ export class TrezorProvider extends RLoginEIP1193Provider {
         })
         this.initialized = true
       } catch (e) {
+        if (e.message === 'TrezorConnect has been already initialized') {
+          return this.chooseAccount(this.path)
+        }
+
         throw new Error(this.#handleTrezorError(e.message))
       }
     }
@@ -80,17 +84,17 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   }
 
   async chooseAccount (dpath: string): Promise<RLoginEIP1193Provider> {
-    if (!this.connected) {
-      this.#logger('🦄 attempting to connect!')
-      const result = await TrezorConnect.ethereumGetAddress({ path: dpath, showOnTrezor: false })
+    this.#logger('🦄 attempting to connect!')
+    const result = await TrezorConnect.ethereumGetAddress({ path: dpath, showOnTrezor: false })
 
-      if (result.success) {
-        this.connected = true
-        this.selectedAddress = result.payload.address.toLowerCase()
-      } else {
-        throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
-      }
+    if (result.success) {
+      this.connected = true
+      this.selectedAddress = result.payload.address.toLowerCase()
+      this.path = dpath
+    } else {
+      throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
     }
+
     return this
   }
 
