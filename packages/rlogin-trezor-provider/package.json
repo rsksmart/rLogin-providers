@@ -1,6 +1,6 @@
 {
 	"name": "@rsksmart/rlogin-trezor-provider",
-	"version": "1.0.2-beta.2",
+	"version": "1.0.2-beta.3",
 	"description": "rLogin - Trezor EIP-1193 provider",
 	"main": "dist/bundle.js",
 	"types": "dist/index.d.ts",
@@ -39,6 +39,6 @@
     "buffer": "^6.0.3",
 		"ethjs-provider-http": "^0.1.6",
 		"stream-browserify": "^3.0.0",
-		"trezor-connect": "^8.2.1"
+		"trezor-connect": "^8.2.5"
 	}
 }
