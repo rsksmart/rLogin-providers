@@ -13,8 +13,7 @@
  * @returns the first account of standard BIP-44 derviation path forthe given network
  */
 
-export const getDPathByChainId = (chainId: number, index: number = 0, isLedger = false): string => {
-  if (isLedger && chainId === 31) return `m/44'/1'/0'/0/${index}` // Ledger + RSK Testnet - based on slip-44 - 37310 does not work
+export const getDPathByChainId = (chainId: number, index: number = 0): string => {
   switch (chainId) {
     case 30: return `m/44'/137'/0'/0/${index}` // RSK Mainnet - based on rskip-57
     case 31: return `m/44'/37310'/0'/0/${index}` // RSK Testnet - based on rskip-57

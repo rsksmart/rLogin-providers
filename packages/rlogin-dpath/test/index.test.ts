@@ -18,13 +18,13 @@ describe('dpath for network id', () => {
     test(testCase.title, () => {
       expect(getDPathByChainId(testCase.chainId)).toEqual(testCase['0'])
       expect(getDPathByChainId(testCase.chainId, 2)).toEqual(testCase['2'])
-      expect(getDPathByChainId(testCase.chainId, 0, true)).toEqual(testCase.forLedeger || testCase['0'])
+      expect(getDPathByChainId(testCase.chainId, 0)).toEqual(testCase.forLedeger || testCase['0'])
     })
   }
 
   test('throws for other coins', () => {
     expect(() => getDPathByChainId(200)).toThrow()
     expect(() => getDPathByChainId(200, 2)).toThrow()
-    expect(() => getDPathByChainId(200, 2, true)).toThrow()
+    expect(() => getDPathByChainId(200, 2)).toThrow()
   })
 })

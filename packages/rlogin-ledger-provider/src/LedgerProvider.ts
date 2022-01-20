@@ -28,7 +28,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
 
     this.debug = !!debug
 
-    this.dpath = dPath || getDPathByChainId(chainId, 0, true)
+    this.dpath = dPath || getDPathByChainId(chainId, 0)
   }
 
   /**
@@ -49,7 +49,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
     this.#logger('🦄 try to interperate the error: ', err)
     switch (err.message) {
       case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return 'Unlock the device to connect.'
-      case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return 'Navigate to the correct app (Ethereum or RSK Mainnet) in the Ledger.'
+      case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return 'Navigate to the correct app in the Ledger.'
       case 'Ledger device: UNKNOWN_ERROR (0x6511)': return 'Open up the correct app in the Ledger.' // no app selected
       // unknown error
       default: return err.message
@@ -97,7 +97,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
     return indexes.reduce((lastProm, index) => lastProm.then(
       (resultArrSoFar) => {
-        const dPath = getDPathByChainId(this.chainId, index, true)
+        const dPath = getDPathByChainId(this.chainId, index)
         return this.appEth.getAddress(dPath, false)
           .then(result => [...resultArrSoFar, { dPath, address: result.address }])
       }
