@@ -21,10 +21,15 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   private appEthConnected: boolean = false
   private appEth?: AppEth
 
+  private useEthereumDPath: boolean
+
   private debug: boolean
 
   constructor ({ chainId, rpcUrl, dPath, debug }: LedgerProviderOptions) {
     super({ rpcUrl, chainId })
+
+    // allows a user to connect to RSK using the Ethereum path
+    this.useEthereumDPath = dPath === "m/44'/60'/0'/0"
 
     this.debug = !!debug
 
@@ -83,6 +88,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
 
   // Choose an account from the derivation path
   async chooseAccount (dpath: string): Promise<RLoginEIP1193Provider> {
+    console.log('chooseAccount', dpath)
     try {
       const result = await this.appEth.getAddress(dpath)
       this.selectedAddress = result.address
@@ -97,7 +103,8 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
     return indexes.reduce((lastProm, index) => lastProm.then(
       (resultArrSoFar) => {
-        const dPath = getDPathByChainId(this.chainId, index)
+        const chainId = this.useEthereumDPath ? 1 : this.chainId
+        const dPath = getDPathByChainId(chainId, index)
         return this.appEth.getAddress(dPath, false)
           .then(result => [...resultArrSoFar, { dPath, address: result.address }])
       }
