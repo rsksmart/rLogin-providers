@@ -88,7 +88,6 @@ export class LedgerProvider extends RLoginEIP1193Provider {
 
   // Choose an account from the derivation path
   async chooseAccount (dpath: string): Promise<RLoginEIP1193Provider> {
-    console.log('chooseAccount', dpath)
     try {
       const result = await this.appEth.getAddress(dpath)
       this.selectedAddress = result.address
