@@ -1,6 +1,6 @@
 {
 	"name": "@rsksmart/rlogin-ledger-provider",
-	"version": "1.0.2-beta.3",
+	"version": "1.0.2-beta.4",
 	"description": "rLogin - Ledger EIP-1193 provider",
 	"main": "dist/bundle.js",
 	"types": "dist/index.d.ts",
@@ -29,7 +29,7 @@
 	"homepage": "https://github.com/rsksmart/rLogin-providers#readme",
 	"devDependencies": {
 		"@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.7",
-		"webpack-cli": "^4.9.1"
+		"webpack-cli": "^4.9.2"
 	},
 	"dependencies": {
 		"@ethereumjs/tx": "^3.3.0",
