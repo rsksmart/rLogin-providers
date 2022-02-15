@@ -25,6 +25,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   opts: TrezorOptions
   initialized = false
   connected = false
+  private useEthereumDPath: boolean
 
   debug = false
 
@@ -36,6 +37,9 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     super({ rpcUrl, chainId })
 
     this.debug = !!debug
+
+    // allows a user to connect to RSK using the Ethereum path
+    this.useEthereumDPath = dPath === "m/44'/60'/0'/0"
 
     this.path = dPath || getDPathByChainId(chainId)
     this.opts = { manifestEmail, manifestAppUrl }
@@ -99,8 +103,10 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   }
 
   async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
+    const chainId = this.useEthereumDPath ? 1 : this.chainId
+
     const bundle = indexes.map((index) => ({
-      path: getDPathByChainId(this.chainId, index),
+      path: getDPathByChainId(chainId, index),
       showOnTrezor: false
     }))
 
