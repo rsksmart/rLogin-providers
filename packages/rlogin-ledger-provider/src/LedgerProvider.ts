@@ -21,15 +21,10 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   private appEthConnected: boolean = false
   private appEth?: AppEth
 
-  private useEthereumDPath: boolean
-
   private debug: boolean
 
   constructor ({ chainId, rpcUrl, dPath, debug }: LedgerProviderOptions) {
     super({ rpcUrl, chainId })
-
-    // allows a user to connect to RSK using the Ethereum path
-    this.useEthereumDPath = dPath === "m/44'/60'/0'/0"
 
     this.debug = !!debug
 
@@ -99,14 +94,12 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   }
 
   // note: ledger can only get one address at a time, so Promise.all will result in a thrown error
-  async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
-    return indexes.reduce((lastProm, index) => lastProm.then(
-      (resultArrSoFar) => {
-        const chainId = this.useEthereumDPath ? 1 : this.chainId
-        const dPath = getDPathByChainId(chainId, index)
-        return this.appEth.getAddress(dPath, false)
+  async getAddresses (dPaths: string[]): Promise<{path: string, address:string}[]> {
+    return dPaths.reduce((lastProm, dPath) => lastProm.then(
+      (resultArrSoFar) =>
+        this.appEth.getAddress(dPath, false)
           .then(result => [...resultArrSoFar, { dPath, address: result.address }])
-      }
+          .catch(error => Promise.reject(this.#handleLedgerError(error)))
     ), Promise.resolve([]))
   }
 
