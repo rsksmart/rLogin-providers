@@ -98,9 +98,9 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     return this
   }
 
-  async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
-    const bundle = indexes.map((index) => ({
-      path: getDPathByChainId(this.chainId, index),
+  async getAddresses (dPaths: string[]): Promise<{path: string, address:string}[]> {
+    const bundle = dPaths.map((path) => ({
+      path,
       showOnTrezor: false
     }))
 

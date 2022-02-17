@@ -94,13 +94,12 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   }
 
   // note: ledger can only get one address at a time, so Promise.all will result in a thrown error
-  async getAddresses (indexes: number[]): Promise<{path: string, address:string}[]> {
-    return indexes.reduce((lastProm, index) => lastProm.then(
-      (resultArrSoFar) => {
-        const dPath = getDPathByChainId(this.chainId, index)
-        return this.appEth.getAddress(dPath, false)
+  async getAddresses (dPaths: string[]): Promise<{path: string, address:string}[]> {
+    return dPaths.reduce((lastProm, dPath) => lastProm.then(
+      (resultArrSoFar) =>
+        this.appEth.getAddress(dPath, false)
           .then(result => [...resultArrSoFar, { dPath, address: result.address }])
-      }
+          .catch(error => Promise.reject(this.#handleLedgerError(error)))
     ), Promise.resolve([]))
   }
 
