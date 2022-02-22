@@ -23,7 +23,7 @@ describe('createTransaction', () => {
 
     const expectedEstimatedTx: Transaction = {
       ...basicTx,
-      value: '0x00',
+      value: '0x0',
       data: '0x',
       nonce: mockTransactionCount,
       gasPrice: mockGasPrice * 1.01,

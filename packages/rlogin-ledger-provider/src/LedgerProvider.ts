@@ -106,6 +106,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   async ethSendTransaction (params: EthSendTransactionParams): Promise<string> {
     this.#validateIsConnected()
     const transaction = await createTransaction(this.provider, this.selectedAddress, params[0])
+    this.#logger('🦄 sending tx request to device', transaction)
     const serializedTx: string = await signTransaction(transaction, this.appEth, this.dpath, this.chainId)
     return await this.provider.sendRawTransaction(`0x${serializedTx}`)
   }
