@@ -129,3 +129,7 @@ yarn run lint:fix
 ```
 yarn run build
 ```
+
+## Disclaimer
+
+`@rsksmart/rlogin-dcent-provider` depends on [`@rsksmart/dcent-provider`](https://github.com/rsksmart/dcent-provider) that is a fork from [`dcent-provider`](https://github.com/DcentWallet/dcent-provider), modified just to allow using RSK standard derivation path. The latest has dependencies with known vulnerabilities not yet fixed, and a `-beta` tag on its name. This being said, Any problem caused by this is under the responsibility of whoever installs this package. We are going to keep our `-beta` tag until this is fixed.
