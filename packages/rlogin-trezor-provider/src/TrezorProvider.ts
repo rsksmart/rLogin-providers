@@ -143,6 +143,8 @@ export class TrezorProvider extends RLoginEIP1193Provider {
       chainId: this.chainId
     }
 
+    this.#logger('🦄 sending tx request to device', tx)
+
     const result = await TrezorConnect.ethereumSignTransaction({
       path: this.path,
       transaction: tx
