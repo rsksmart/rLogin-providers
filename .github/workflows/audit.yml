@@ -16,5 +16,5 @@ jobs:
         node-version: 14.x
 
     - run: npm run setup
-    - run: npx lerna exec --ignore @rsksmart/rlogin-dcent-provider --no-bail --parallel npm audit
+    - run: npm run audit-packages
     # - run: npm audit
