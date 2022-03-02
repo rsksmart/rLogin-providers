@@ -33,7 +33,7 @@
 	"dependencies": {
     "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.2",
     "@rsksmart/rlogin-transactions": "^1.0.2",
-    "@rsksmart/rlogin-dpath": "^1.0.2",
+    "@rsksmart/rlogin-dpath": "^1.0.3",
 		"@ethereumjs/tx": "^3.3.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
