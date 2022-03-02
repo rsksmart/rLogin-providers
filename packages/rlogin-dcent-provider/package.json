@@ -29,9 +29,9 @@
 	"homepage": "https://github.com/rsksmart/rLogin-providers#readme",
 	"dependencies": {
 		"@rsksmart/dcent-provider": "^0.3.0-beta",
-		"@rsksmart/rlogin-dpath": "^1.0.1",
-    "@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.2-beta.1",
-    "@rsksmart/rlogin-transactions": "^1.0.2-beta.2",
+		"@rsksmart/rlogin-dpath": "^1.0.2",
+		"@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.2",
+		"@rsksmart/rlogin-transactions": "^1.0.2",
 		"assert": "^2.0.0",
 		"buffer": "^6.0.3",
 		"stream-browserify": "^3.0.0",

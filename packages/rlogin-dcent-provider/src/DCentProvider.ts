@@ -110,7 +110,8 @@ export class DCentProvider extends RLoginEIP1193Provider {
     transaction.gas = transaction.gasLimit
     delete transaction.gasLimit
 
-    this.#logger('🦄 attempting to send tx!')
+    this.#logger('🦄 sending tx request to device', transaction)
+
     return await this.dcentProvider.send('eth_sendTransaction', transaction)
   }
 }

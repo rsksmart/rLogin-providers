@@ -1,6 +1,6 @@
 {
   "name": "@rsksmart/rlogin-eip1193-proxy-subprovider",
-  "version": "1.0.2-beta.1",
+  "version": "1.0.2",
   "description": "rLogin - EIP-1193 subprovider",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/rsksmart/rLogin-providers#readme",
   "devDependencies": {
-    "@rsksmart/rlogin-eip1193-types": "^1.0.1"
+    "@rsksmart/rlogin-eip1193-types": "^1.0.2"
   },
   "dependencies": {
 		"buffer": "^6.0.3",
