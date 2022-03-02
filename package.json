@@ -8,7 +8,8 @@
     "test": "npx jest packages/*/test --verbose --coverage --collectCoverageFrom=packages/*/src/**/*",
     "test:watch": "npx jest packages/*/test --watch",
     "lint": "npx eslint ./packages --ext .json,.js,.ts",
-    "lint:fix": "npx eslint ./packages --ext .json,.js,.ts --fix"
+    "lint:fix": "npx eslint ./packages --ext .json,.js,.ts --fix",
+    "audit-packages": "npx lerna exec --ignore @rsksmart/rlogin-dcent-provider --parallel npm audit"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
