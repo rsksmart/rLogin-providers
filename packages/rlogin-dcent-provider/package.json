@@ -29,7 +29,7 @@
 	"homepage": "https://github.com/rsksmart/rLogin-providers#readme",
 	"dependencies": {
 		"@rsksmart/dcent-provider": "^0.3.0-beta",
-		"@rsksmart/rlogin-dpath": "^1.0.2",
+		"@rsksmart/rlogin-dpath": "^1.0.3",
 		"@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.2",
 		"@rsksmart/rlogin-transactions": "^1.0.2",
 		"assert": "^2.0.0",
