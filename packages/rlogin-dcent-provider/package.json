@@ -1,6 +1,6 @@
 {
 	"name": "@rsksmart/rlogin-dcent-provider",
-	"version": "1.0.2-beta.2",
+	"version": "1.0.2-beta.5",
 	"description": "rLogin - D'cent EIP-1193 provider",
 	"main": "dist/bundle.js",
 	"types": "dist/index.d.ts",
