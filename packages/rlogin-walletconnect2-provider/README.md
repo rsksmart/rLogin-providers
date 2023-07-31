@@ -44,31 +44,24 @@ yarn add @rsksmart/rlogin-walletconnect2-provider
 
 In your dapp, your rLogin implementation should be similar to this:
 
-```
+```ts
 import RLogin from '@rsksmart/rlogin'
 import { WalletConnect2Provider } from '@rsksmart/rlogin-walletconnect2-provider'
-
-const WalletConnect2Options = {
-  projectId: 'PROJECTID',
-  chains: ['31'],
-  showQrModal: true,
-  //methods, // OPTIONAL ethereum methods
-  //events, // OPTIONAL ethereum events
-  rpcMap: rpcUrls, // OPTIONAL rpc urls for each chain
-  //metadata, // OPTIONAL metadata of your app
-  //qrModalOptions, // OPTIONAL - `undefined` by default
-}
-// ...
 
 const rLogin = new RLogin({
   cacheProvider: false,
   providerOptions: {
     walletconnect: {
-      package: (opts) => new WalletConnect2Provider({ ...opts, ...WalletConnect2Options }),
+      package: WalletConnect2Provider,
       options: {
-        rpc: rpcUrls,
-        bridge: 'https://walletconnect-bridge.rifos.org/',
-        networkParams: WalletConnect2Options,
+        projectId: 'PROJECTID',
+        chains: [30, 31],
+        showQrModal: true,
+        //methods, // OPTIONAL ethereum methods
+        //events, // OPTIONAL ethereum events
+        rpcMap: rpcUrls, // OPTIONAL rpc urls for each chain
+        //metadata, // OPTIONAL metadata of your app
+        //qrModalOptions, // OPTIONAL - `undefined` by default
       }
     },
   },
