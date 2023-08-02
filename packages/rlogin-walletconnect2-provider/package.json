@@ -1,6 +1,6 @@
 {
   "name": "@rsksmart/rlogin-walletconnect2-provider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "rLogin - WalletConnect2 Adapter as a Provider",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
