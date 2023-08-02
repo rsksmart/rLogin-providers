@@ -18,14 +18,16 @@ module.exports = {
     extensions: ['.ts', '.js']
   },
   plugins: [
-    new webpack.DefinePlugin({ process: { env: { DEBUG: false } } })
+    new webpack.DefinePlugin({ process: { env: { DEBUG: false } } }),
+    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })
   ],
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'umd',
     library: 'rLoginWalletConnect2Provider',
+    libraryTarget: 'umd',
     umdNamedDefine: true,
-    globalObject: 'this'
+    globalObject: 'this',
+    clean: true
   }
 }
