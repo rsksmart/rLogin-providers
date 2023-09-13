@@ -1,9 +1,9 @@
 <p align="middle">
   <img src="https://user-images.githubusercontent.com/766679/236442723-004fc7a5-edb2-4477-86da-0b687d62702f.svg" alt="logo" height="100" >
 </p>
-<h3 align="middle"><code>@rsksmart/rlogin-ledger-provider</code></h3>
+<h3 align="middle"><code>@rsksmart/rlogin-walletconnect2-provider</code></h3>
 <p align="middle">
-  rLogin Ledger Provider
+  rLogin WalletConnect 2 Provider
 </p>
 <p align="middle">
   <a href="https://github.com/rsksmart/rlogin-ledger-connector/actions/workflows/ci.yml" alt="ci">
@@ -28,41 +28,42 @@
   -->
 </p>
 
-A Ledger provider connection for rLogin. Still in beta and tested manually for now.
+A WalletConnect 2 provider connection for rLogin. Still in beta and tested manually for now.
 
 ## Features
 
-Allow users to connect to your dapp using a Ledger device. Currently works with USB and returns an EIP1193 provider.
+Allow you to connect to WalletConnect 2 by using rLogin
 
 ## Implementation
-
-The implementation is a bit different for Ledger because it is not a Web3Modal supported provider. 
 
 Add the dependecy to your project
 
 ```
-yarn add @rsksmart/rlogin-ledger-provider --save
+yarn add @rsksmart/rlogin-walletconnect2-provider
 ```
 
 In your dapp, your rLogin implementation should be similar to this:
 
-```
+```ts
 import RLogin from '@rsksmart/rlogin'
-import { ledgerProviderOptions } from '@rsksmart/rlogin-ledger-provider'
-
-// ...
+import { WalletConnect2Provider } from '@rsksmart/rlogin-walletconnect2-provider'
 
 const rLogin = new RLogin({
   cacheProvider: false,
   providerOptions: {
-    // ... other providers, i.e. WalletConnect or Portis, etc
-   'custom-ledger': {
-      ...ledgerProviderOptions,
+    walletconnect: {
+      package: WalletConnect2Provider,
       options: {
-        rpcUrl: 'https://public-node.testnet.rsk.co',
-        chainId: 31
+        projectId: 'PROJECTID',
+        chains: [30, 31],
+        showQrModal: true,
+        //methods, // OPTIONAL ethereum methods
+        //events, // OPTIONAL ethereum events
+        rpcMap: rpcUrls, // OPTIONAL rpc urls for each chain
+        //metadata, // OPTIONAL metadata of your app
+        //qrModalOptions, // OPTIONAL - `undefined` by default
       }
-    }
+    },
   },
   supportedChains: [30, 31]
 })
@@ -70,38 +71,21 @@ const rLogin = new RLogin({
 
 ### Implementation notes
 
-- Similar to the Portis connector, you can only specify a single chainId to connect to.
-- The `custom-` needs to be added because Ledger is not a Web3Modal supported provider. The `...ledgerProviderOptions` contains the Ledger's text and image and connects rLogin to the provider.
-- Ledger has two apps that work with RSK:
-  - The RSK App will only work with RSK Mainnet as it uses the correct derivation path of `44'/137'/0'/0/0`
-  - To use RSK Testnet, you must use the Ethereum App on the Ledger. It will use the standard Ethereum derivation path of `44'/60'/0'/0/0`. As of writing, no Ledger app will accept the RSK Testnet derivation path.
-- pass `debug: true` for console logs that may help you debug.
-
 ## Run for development
 
 Install dependencies:
 
 ```
-yarn i
+yarn
 ```
 
 ### Run unit tests
 
-```
-yarn test
-```
-
-Coverage report with:
-
-```
-yarn run test:coverage
-```
+TBD
 
 ### Run linter
 
-```
-yarn run lint
-```
+TBD
 
 Auto-fix:
 
