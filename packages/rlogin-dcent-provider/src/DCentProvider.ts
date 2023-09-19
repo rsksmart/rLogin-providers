@@ -70,10 +70,16 @@ export class DCentProvider extends RLoginEIP1193Provider {
   async personalSign (params: PersonalSignParams): Promise<string> {
     this.#validateIsConnected()
     this.#logger('🦄 attempting to sign message!')
-    const messageHex = Buffer.from(params[0]).toString('hex')
+
+    // convert the string to a hex if it isn't already:
+    const messageHex =
+      params[0].match(/^0x[0-9a-f]+$/i)
+        ? params[0]
+        : `0x${Buffer.from(params[0]).toString('hex')}`
+
     return await this.dcentProvider.send(
       'personal_sign',
-      [`0x${messageHex}`, params[1]]
+      [messageHex, params[1]]
     )
   }
 
