@@ -7,10 +7,12 @@ import { PersonalSignParams, SignParams, EthSendTransactionParams } from '@rsksm
 import { RLoginEIP1193ProviderOptions, RLoginEIP1193Provider } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
+import { remove0x } from '@rsksmart/rsk-utils'
 
 type LedgerProviderOptions = RLoginEIP1193ProviderOptions & {
   debug?: boolean
   dPath?: string
+  messageHashed?: boolean
 }
 
 export class LedgerProvider extends RLoginEIP1193Provider {
@@ -23,8 +25,12 @@ export class LedgerProvider extends RLoginEIP1193Provider {
 
   private debug: boolean
 
-  constructor ({ chainId, rpcUrl, dPath, debug }: LedgerProviderOptions) {
+  public messageHashed: boolean
+
+  constructor ({ chainId, rpcUrl, dPath, debug, messageHashed }: LedgerProviderOptions) {
     super({ rpcUrl, chainId })
+
+    this.messageHashed = !!messageHashed
 
     this.debug = !!debug
 
@@ -51,7 +57,7 @@ export class LedgerProvider extends RLoginEIP1193Provider {
       case 'Ledger device: UNKNOWN_ERROR (0x6b0c)': return 'Unlock the device to connect.'
       case 'Ledger device: UNKNOWN_ERROR (0x6a15)': return 'Navigate to the correct app in the Ledger.'
       case 'Ledger device: UNKNOWN_ERROR (0x6511)': return 'Open up the correct app in the Ledger.' // no app selected
-      // unknown error
+        // unknown error
       default: return err.message
     }
   }
@@ -114,8 +120,8 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   // reference: https://github.com/LedgerHQ/ledgerjs/tree/master/packages/hw-app-eth#signpersonalmessage
   private async validateConnectionAndPersonalSign (hexMessage: string): Promise<string> {
     this.#validateIsConnected()
-    const message = convertFromHex(hexMessage)
-    const result = await this.appEth.signPersonalMessage(this.dpath, Buffer.from(message).toString('hex'))
+    this.#logger('🦄 signing message request to device', hexMessage)
+    const result = await this.appEth.signPersonalMessage(this.dpath, hexMessage)
     const v = result.v - 27
     let v2 = v.toString(16)
     if (v2.length < 2) {
@@ -130,7 +136,14 @@ export class LedgerProvider extends RLoginEIP1193Provider {
   }
 
   personalSign (params: PersonalSignParams): Promise<string> {
-    return this.validateConnectionAndPersonalSign(params[0])
+    this.#validateIsConnected()
+    let message = ''
+    if (this.messageHashed) {
+      message = remove0x(params[0])
+    } else {
+      message = Buffer.from(convertFromHex(params[0])).toString('hex')
+    }
+    return this.validateConnectionAndPersonalSign(message)
   }
 
   async disconnect () {
