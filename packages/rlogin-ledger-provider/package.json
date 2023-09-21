@@ -39,6 +39,7 @@
 		"@rsksmart/rlogin-dpath": "^1.0.3",
 		"@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.2",
 		"@rsksmart/rlogin-transactions": "^1.0.2",
+		"@rsksmart/rsk-utils": "^1.1.0",
 		"assert": "^2.0.0",
 		"bn.js": "^5.2.0",
 		"buffer": "^6.0.3",
