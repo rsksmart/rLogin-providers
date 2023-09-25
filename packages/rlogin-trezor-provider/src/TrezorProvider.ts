@@ -1,9 +1,10 @@
-import TrezorConnect from 'trezor-connect'
+import TrezorConnect, { EthereumTransaction } from '@trezor/connect-web'
 import { Transaction } from '@ethereumjs/tx'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { EthSendTransactionParams, SignParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
+import { Unsuccessful } from '@trezor/connect/lib/types/params'
 
 type TrezorOptions = {
   manifestEmail: string
@@ -86,15 +87,14 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   async chooseAccount (dpath: string): Promise<RLoginEIP1193Provider> {
     this.#logger('🦄 attempting to connect!')
     const result = await TrezorConnect.ethereumGetAddress({ path: dpath, showOnTrezor: false })
-
     if (result.success) {
       this.connected = true
       this.selectedAddress = result.payload.address.toLowerCase()
       this.path = dpath
     } else {
-      throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
+      const unsuccessfulResponse = result as Unsuccessful
+      throw new Error(this.#handleTrezorError(unsuccessfulResponse.payload.error, unsuccessfulResponse.payload.code))
     }
-
     return this
   }
 
@@ -119,7 +119,8 @@ export class TrezorProvider extends RLoginEIP1193Provider {
     if (result.success) {
       return `0x${result.payload.signature}`
     } else {
-      throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
+      const unsuccessfulResponse = result as Unsuccessful
+      throw new Error(this.#handleTrezorError(unsuccessfulResponse.payload.error, unsuccessfulResponse.payload.code))
     }
   }
 
@@ -147,7 +148,7 @@ export class TrezorProvider extends RLoginEIP1193Provider {
 
     const result = await TrezorConnect.ethereumSignTransaction({
       path: this.path,
-      transaction: tx
+      transaction: tx as EthereumTransaction
     })
 
     if (result.success) {
@@ -157,7 +158,8 @@ export class TrezorProvider extends RLoginEIP1193Provider {
       })
       return await this.provider.sendRawTransaction(`0x${signedTransaction.serialize().toString('hex')}`)
     } else {
-      throw new Error(this.#handleTrezorError(result.payload.error, result.payload.code))
+      const unsuccessfulResponse = result as Unsuccessful
+      throw new Error(this.#handleTrezorError(unsuccessfulResponse.payload.error, unsuccessfulResponse.payload.code))
     }
   }
 }
