@@ -14,3 +14,4 @@ junit.xml
 coverage
 
 *.DS_Store
+.idea
