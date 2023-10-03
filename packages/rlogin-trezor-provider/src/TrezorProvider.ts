@@ -1,10 +1,9 @@
-import TrezorConnect, { EthereumTransaction } from '@trezor/connect-web'
+import TrezorConnect, { EthereumTransaction, Unsuccessful } from '@trezor/connect-web'
 import { Transaction } from '@ethereumjs/tx'
 import { RLoginEIP1193Provider, RLoginEIP1193ProviderOptions } from '@rsksmart/rlogin-eip1193-proxy-subprovider'
 import { EthSendTransactionParams, SignParams, PersonalSignParams } from '@rsksmart/rlogin-eip1193-types'
 import { getDPathByChainId } from '@rsksmart/rlogin-dpath'
 import { createTransaction } from '@rsksmart/rlogin-transactions'
-import { Unsuccessful } from '@trezor/connect/lib/types/params'
 
 type TrezorOptions = {
   manifestEmail: string
