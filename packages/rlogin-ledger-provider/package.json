@@ -1,6 +1,6 @@
 {
 	"name": "@rsksmart/rlogin-ledger-provider",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "rLogin - Ledger EIP-1193 provider",
 	"main": "dist/bundle.js",
 	"types": "dist/index.d.ts",
