@@ -28,21 +28,26 @@
 	},
 	"homepage": "https://github.com/rsksmart/rLogin-providers#readme",
 	"devDependencies": {
-		"@rsksmart/rlogin-eip1193-types": "^1.0.0-beta.7",
+		"@rsksmart/rlogin-eip1193-types": "^1.0.2",
+		"webpack": "^5.90.3",
 		"webpack-cli": "^4.9.2"
 	},
 	"dependencies": {
-		"@ethereumjs/tx": "^3.3.0",
-		"@ledgerhq/hw-app-eth": "^6.2.0",
-		"@ledgerhq/hw-transport-webhid": "^6.4.1",
-		"@ledgerhq/hw-transport-webusb": "^6.3.0",
+		"@ethereumjs/tx": "4.1",
+		"@ledgerhq/hw-app-eth": "^6.35.5",
+		"@ledgerhq/hw-transport-webhid": "^6.28.4",
+		"@ledgerhq/hw-transport-webusb": "^6.28.4",
 		"@rsksmart/rlogin-dpath": "^1.0.3",
 		"@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.2",
 		"@rsksmart/rlogin-transactions": "^1.0.2",
 		"@rsksmart/rsk-utils": "^1.1.0",
-		"assert": "^2.0.0",
-		"bn.js": "^5.2.0",
+		"assert": "^2.1.0",
+		"bn.js": "^5.2.1",
+		"browserify-zlib": "^0.2.0",
 		"buffer": "^6.0.3",
-		"stream-browserify": "^3.0.0"
+		"https-browserify": "^1.0.0",
+		"stream-browserify": "^3.0.0",
+		"stream-http": "^3.2.0",
+		"url": "^0.11.3"
 	}
 }
