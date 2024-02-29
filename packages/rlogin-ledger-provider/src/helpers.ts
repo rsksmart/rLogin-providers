@@ -4,9 +4,10 @@ import { Transaction } from '@ethereumjs/tx'
 
 /**
  * Sign a transaction using the Ledger
- * @param transaction Transaction from the dapp
+ * @param transactionData
  * @param appEth
  * @param path
+ * @param chainId
  * @returns serialized Transaction
  */
 export const signTransaction = (
