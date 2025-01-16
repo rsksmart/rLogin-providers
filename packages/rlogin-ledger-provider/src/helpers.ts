@@ -1,6 +1,6 @@
 import AppEth from '@ledgerhq/hw-app-eth'
 import { CompleteTx } from '@rsksmart/rlogin-transactions'
-import { Transaction } from '@ethereumjs/tx'
+import { ethers } from 'ethers'
 
 /**
  * Sign a transaction using the Ledger
@@ -13,25 +13,27 @@ import { Transaction } from '@ethereumjs/tx'
 export const signTransaction = (
   transactionData: CompleteTx, appEth: AppEth, path: string, chainId: number
 ) => {
-  const txData = {
-    ...transactionData,
-    chainId,
-
-    // these are needed here so signTransaction works correctly
-    v: `0x${chainId.toString(16)}`, // chain id
-    r: '0x00',
-    s: '0x00'
+  // (nonce, gasprice, startgas, to, value, data, chainid, 0, 0)
+  const { from: address, ...txPlainData } = transactionData
+  const txData: ethers.utils.UnsignedTransaction = {
+    ...txPlainData,
+    chainId
   }
-
-  const tx = new Transaction(txData)
-  const serializedTx = tx.serialize().toString('hex')
-  return appEth.signTransaction(path, serializedTx)
+  const serializedEthersTx = ethers.utils.serializeTransaction(txData).slice(2)
+  return appEth.signTransaction(path, serializedEthersTx)
     .then((sig: {r: string, v: string, s: string}) => {
-      txData.v = '0x' + sig.v
-      txData.r = '0x' + sig.r
-      txData.s = '0x' + sig.s
-
-      return new Transaction(txData).serialize().toString('hex')
+      const signature = {
+        v: parseInt('0x' + sig.v),
+        r: '0x' + sig.r,
+        s: '0x' + sig.s,
+        from: address
+      }
+      // Serialize the same transaction as before, but adding the signature on it
+      return ethers.utils.serializeTransaction(txData, signature).slice(2)
+    })
+    .catch((err: Error) => {
+      console.error('Error signing transaction:', err)
+      throw err
     })
 }
 
