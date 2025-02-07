@@ -13,14 +13,11 @@ jobs:
     - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
+        node-version: 22.x
 
-    - run: sed -i 's/ssh:/https:/g' ./packages/rlogin-dcent-provider/package-lock.json # avoid issue caused by using ssh from github actions
-    - run: npm i
-    - run: npm run setup
+    - run: npm ci
     - run: npm run build
     - run: npm run test
-    - run: npm run lint
     - run: npx lerna exec -- npm publish --dry-run
     - name: Coveralls
       uses: coverallsapp/github-action@master
