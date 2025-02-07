@@ -1,34 +1,28 @@
 {
   "name": "root",
   "private": true,
+  "workspaces": [
+    "./packages/*"
+  ],
   "scripts": {
-    "link": "npx lerna link",
-    "setup": "npx lerna bootstrap",
-    "build": "npx lerna run build",
     "test": "npx jest packages/*/test --verbose --coverage --collectCoverageFrom=packages/*/src/**/*",
-    "test:watch": "npx jest packages/*/test --watch",
-    "lint": "npx eslint ./packages --ext .json,.js,.ts",
-    "lint:fix": "npx eslint ./packages --ext .json,.js,.ts --fix",
-    "audit-packages": "npx lerna exec npm audit"
+    "build": "npx lerna run build",
+    "lint": "npx eslint ./packages"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
-    "@typescript-eslint/eslint-plugin": "^4.23.0",
-    "@typescript-eslint/parser": "^4.23.0",
-    "eslint": "^7.26.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^24.3.6",
-    "eslint-plugin-json": "^3.1.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "jest": "^26.6.3",
-    "jest-junit": "^13.0.0",
-    "lerna": "^4.0.0",
-    "ts-jest": "^26.5.6",
-    "ts-loader": "^9.1.2",
-    "typescript": "^4.2.4",
-    "webpack": "^5.52.0",
-    "webpack-cli": "^4.7.2"
+    "@eslint/js": "^9.19.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.1",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "lerna": "^8.1.9",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.23.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
   }
 }
