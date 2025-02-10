@@ -2,18 +2,29 @@ name: ci
 
 on:
   pull_request
+# Declare default permissions as read only.
+permissions: read-all
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
+    - name: Checkout
+      uses: actions/checkout@163217dfcd28294438ea1c1c149cfaf66eec283e # v4.2.1
       with:
-        node-version: 22.x
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+
+    - name: Setup NodeJS
+      uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'npm'
 
     - run: npm ci
     - run: npm run build
