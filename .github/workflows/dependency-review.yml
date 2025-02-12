@@ -28,4 +28,3 @@ jobs:
           split -b 1024k dependency-review-summary.md dependency-review-summary-part
           for part in dependency-review-summary-part*; do
             gh api repos/:owner/:repo/actions/workflows/:workflow_id/runs/:run_id/jobs/:job_id/steps/:step_id/summary --input $part
-          done
