@@ -75,6 +75,7 @@ jobs:
           with:
             node-version-file: '.nvmrc'
             cache: 'npm'
+            registry-url: https://registry.npmjs.org
 
     #   Install dependencies and build
         - name: Install dependencies and build
