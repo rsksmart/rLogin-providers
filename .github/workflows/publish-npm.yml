@@ -79,7 +79,7 @@ jobs:
 
     #   Install dependencies and build
         - name: Install dependencies and build
-          run:
+          run: |
             npm ci
             npm run build
 
