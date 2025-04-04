@@ -40,8 +40,7 @@
 		"@rsksmart/rlogin-dpath": "^1.0.3",
 		"@rsksmart/rlogin-eip1193-proxy-subprovider": "^1.0.2",
 		"@rsksmart/rlogin-transactions": "^1.0.2",
-		"@trezor/connect": "^9.5.1",
-		"@trezor/connect-web": "^9.1.9",
+		"@trezor/connect-web": "^9.5.3",
 		"assert": "^2.1.0",
 		"buffer": "^6.0.3",
 		"ethjs-provider-http": "^0.1.6"
