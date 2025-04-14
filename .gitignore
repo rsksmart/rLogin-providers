@@ -19,3 +19,5 @@ coverage
 lerna-debug.log
 npm-debug.log
 packages/*/lib
+# act
+.actrc
