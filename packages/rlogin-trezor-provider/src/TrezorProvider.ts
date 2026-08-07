@@ -8,7 +8,12 @@ import { createTransaction } from '@rsksmart/rlogin-transactions'
 type TrezorOptions = {
   manifestEmail: string
   manifestAppUrl: string
+  // Required by the Trezor Connect manifest from 9.6 onwards. Optional here so callers
+  // written against earlier versions keep working.
+  manifestAppName?: string
 }
+
+const DEFAULT_MANIFEST_APP_NAME = 'rLogin'
 
 export type TrezorProviderOptions = RLoginEIP1193ProviderOptions & TrezorOptions & {
   debug?: boolean
@@ -31,14 +36,14 @@ export class TrezorProvider extends RLoginEIP1193Provider {
   constructor ({
     rpcUrl, chainId,
     debug, dPath,
-    manifestEmail, manifestAppUrl
+    manifestEmail, manifestAppUrl, manifestAppName
   }: TrezorProviderOptions) {
     super({ rpcUrl, chainId })
 
     this.debug = !!debug
 
     this.path = dPath || getDPathByChainId(chainId)
-    this.opts = { manifestEmail, manifestAppUrl }
+    this.opts = { manifestEmail, manifestAppUrl, manifestAppName }
   }
 
   #logger = (...params: any) => this.debug && console.log(...params)
@@ -67,7 +72,8 @@ export class TrezorProvider extends RLoginEIP1193Provider {
           lazyLoad: true, // this param will prevent iframe injection until TrezorConnect.method will be called
           manifest: {
             email: this.opts.manifestEmail,
-            appUrl: this.opts.manifestAppUrl
+            appUrl: this.opts.manifestAppUrl,
+            appName: this.opts.manifestAppName || DEFAULT_MANIFEST_APP_NAME
           }
         })
         this.initialized = true

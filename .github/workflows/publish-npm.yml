@@ -44,6 +44,10 @@ jobs:
       needs: [check-packages]
       runs-on: ubuntu-latest
       strategy:
+        # Every package in the repo gets a job, but a release normally bumps only some of
+        # them. Without this, the first already-published package to fail cancels the jobs
+        # for the packages that do need publishing.
+        fail-fast: false
         matrix:
           package: ${{ fromJson(needs.check-packages.outputs.matrix) }}
   
@@ -93,26 +97,37 @@ jobs:
             echo "PRE_UPLOAD_HASH: $PRE_UPLOAD_HASH"
         
         - name: Check if version is already published
+          id: version_check
           run: |
             PACKAGE_NAME=$(cat ${{ matrix.package }}/package.json | jq -r .name)
             PACKAGE_VERSION=$(cat ${{ matrix.package }}/package.json | jq -r .version)
 
+            # An `exit 0` here would only end this step -- the publish step would still run
+            # and fail with EPUBLISHCONFLICT. The decision has to be carried as an output.
             if npm view $PACKAGE_NAME@$PACKAGE_VERSION > /dev/null 2>&1; then
                 echo "Version $PACKAGE_VERSION of $PACKAGE_NAME is already published."
-                exit 0
+                echo "skip=true" >> $GITHUB_OUTPUT
+            else
+                echo "Version $PACKAGE_VERSION of $PACKAGE_NAME is not published. Proceeding with publishing..."
+                echo "skip=false" >> $GITHUB_OUTPUT
             fi
 
-            echo "Version $PACKAGE_VERSION of $PACKAGE_NAME is not published. Proceeding with publishing..."
-
         - name: Upload package
+          if: steps.version_check.outputs.skip != 'true'
           run: |
             cd ${{ matrix.package }}
-            npm publish --access public
+            # npm tags every publish `latest` unless told otherwise, prerelease or not, so a
+            # beta would otherwise become what a plain `npm install` resolves to.
+            NPM_TAG=latest
+            case "$(jq -r .version package.json)" in *-*) NPM_TAG=beta ;; esac
+            echo "Publishing with dist-tag: $NPM_TAG"
+            npm publish --access public --tag "$NPM_TAG"
           env:
             NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      
+
         - name: Post upload validation
           id: unpack
+          if: steps.version_check.outputs.skip != 'true'
           run: |
             # Get the package name and version
             PACKAGE_NAME=$(cat ${{ matrix.package }}/package.json | jq -r .name)
@@ -129,6 +144,7 @@ jobs:
             echo "POST_UPLOAD_HASH: $POST_UPLOAD_HASH"
 
         - name: Pre and Post Upload validation
+          if: steps.version_check.outputs.skip != 'true'
           run: |
             echo "Comparing hashes..."
             echo "PRE_UPLOAD_HASH: '${{ steps.pack.outputs.PRE_UPLOAD_HASH }}'"
