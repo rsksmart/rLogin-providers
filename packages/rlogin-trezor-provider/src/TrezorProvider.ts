@@ -8,8 +8,8 @@ import { createTransaction } from '@rsksmart/rlogin-transactions'
 type TrezorOptions = {
   manifestEmail: string
   manifestAppUrl: string
-  // Required by the Trezor Connect manifest from 9.6 onwards. Optional here so callers
-  // written against earlier versions keep working.
+  // Required by the Trezor Connect manifest across the supported peer range; it was still
+  // optional in 9.5.x. Kept optional here, with a default, so existing callers keep working.
   manifestAppName?: string
 }
 
