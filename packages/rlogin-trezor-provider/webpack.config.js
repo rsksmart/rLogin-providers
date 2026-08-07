@@ -14,6 +14,19 @@ module.exports = {
       }
     ]
   },
+  // Trezor Connect is a singleton: it installs a window "message" listener and hands out
+  // sequential request ids starting at 1. Bundling a private copy here put a second instance
+  // on the page alongside the host application's own, and the two cross-resolved each other's
+  // postMessage responses. Keeping it external makes the consumer's single copy authoritative,
+  // and stops a stale Connect (with its own transitive dependencies) being frozen into dist/.
+  externals: {
+    '@trezor/connect-web': {
+      commonjs: '@trezor/connect-web',
+      commonjs2: '@trezor/connect-web',
+      amd: '@trezor/connect-web',
+      root: 'TrezorConnect'
+    }
+  },
   resolve: {
     extensions: ['.ts', '.js'],
     fallback: {
