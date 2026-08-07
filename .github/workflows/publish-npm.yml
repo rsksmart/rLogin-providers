@@ -116,11 +116,23 @@ jobs:
           if: steps.version_check.outputs.skip != 'true'
           run: |
             cd ${{ matrix.package }}
+            PACKAGE_VERSION=$(jq -r .version package.json)
+
             # npm tags every publish `latest` unless told otherwise, prerelease or not, so a
-            # beta would otherwise become what a plain `npm install` resolves to.
+            # prerelease would otherwise become what a plain `npm install` resolves to. Take
+            # the dist-tag from the version's own prerelease identifier rather than assuming
+            # one: 2.0.0-beta.0 -> beta, 1.0.5-alpha -> alpha, 3.1.4-rc.2 -> rc.
             NPM_TAG=latest
-            case "$(jq -r .version package.json)" in *-*) NPM_TAG=beta ;; esac
-            echo "Publishing with dist-tag: $NPM_TAG"
+            if [ "$PACKAGE_VERSION" != "${PACKAGE_VERSION#*-}" ]; then
+              NPM_TAG=$(echo "${PACKAGE_VERSION#*-}" | cut -d. -f1)
+              # npm rejects a dist-tag that parses as a version, so an all-numeric
+              # identifier (1.0.0-1) needs a name instead.
+              if [ -z "$NPM_TAG" ] || [ -z "$(printf '%s' "$NPM_TAG" | tr -d '0-9')" ]; then
+                NPM_TAG=prerelease
+              fi
+            fi
+
+            echo "Publishing $PACKAGE_VERSION with dist-tag: $NPM_TAG"
             npm publish --access public --tag "$NPM_TAG"
           env:
             NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
