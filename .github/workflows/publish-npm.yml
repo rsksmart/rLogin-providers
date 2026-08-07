@@ -2,7 +2,7 @@ name: Deploy packages on NPM
 
 on:
   release:
-    types: [created, edited, published]
+    types: [published]
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -15,14 +15,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: "Check packages existence"
         id: check_files
-        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v3.0.0
+        uses: andstor/file-existence-action@558493d6c74bf472d87c84eab196434afc2fa029 # v3.1.0
         with:
           files: "package.json, README.md, packages/**/package.json"
-          
+
       - name: Required files exist
         if: steps.check_files.outputs.files_exists != 'true'
         run: exit 1
@@ -30,140 +30,157 @@ jobs:
       - name: Generate packages paths
         id: set-matrix
         run: |
-            package_json_paths=()
-            for dir in packages/*/; do
+          package_json_paths=()
+          for dir in packages/*/; do
             folder_name="${dir%/}"
             package_json_paths+=("\"$folder_name\"")
-            done
-            json_list="[$(IFS=,; echo "${package_json_paths[*]}")]"
-            echo "matrix=$json_list" >> "$GITHUB_OUTPUT"   
-      - run: |
-            echo "${{ steps.set-matrix.outputs.matrix }}"
-    
+          done
+          json_list="[$(IFS=,; echo "${package_json_paths[*]}")]"
+          echo "matrix=$json_list" >> "$GITHUB_OUTPUT"
+
+      - name: Print matrix
+        run: echo "${{ steps.set-matrix.outputs.matrix }}"
+
   process-packages:
-      needs: [check-packages]
-      runs-on: ubuntu-latest
-      strategy:
-        # Every package in the repo gets a job, but a release normally bumps only some of
-        # them. Without this, the first already-published package to fail cancels the jobs
-        # for the packages that do need publishing.
-        fail-fast: false
-        matrix:
-          package: ${{ fromJson(needs.check-packages.outputs.matrix) }}
-  
-      steps:
-        - name: Checkout
-          uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        - name: Process package
-          run: |
-            echo "Processing package: ${{ matrix.package }}"
+    needs: [check-packages]
 
-        - name: Get package.json package name and match with repository name
-          run: |
-            echo PACKAGE_NAME=$(cat ${{ matrix.package }}/package.json | jq -r .name | cut -f2 -d"\"" | cut -f2 -d"@") >> $GITHUB_OUTPUT
-            echo PACKAGE_VERSION="refs/tags/v"$(cat ${{ matrix.package }}/package.json | jq -r .version) >> $GITHUB_OUTPUT
-            echo PACKAGE_REPOSITORY=$(cat ${{ matrix.package }}/package.json | jq -r .repository.url | sed 's/\+https//') >> $GITHUB_OUTPUT
-          id: get_package_info
+    # Trusted publishing: npm authenticates the workflow through the OIDC token, so no
+    # long-lived NPM_TOKEN is involved. Each package must have this repository and workflow
+    # registered as a trusted publisher on npmjs.com for the exchange to be accepted.
+    permissions:
+      id-token: write
+      contents: read
 
-        - name: Print outputs for debugging
-          run: |
-            echo "GitHub Repository: ${{ github.repository }}"
-            echo "Package Name: ${{ steps.get_package_info.outputs.PACKAGE_NAME }}"
-            echo "Github Tag: ${{ github.ref }}"
-            echo "Package Version: ${{ steps.get_package_info.outputs.PACKAGE_VERSION }}"
-            echo "GitHub Repository URL: ${{ github.repositoryUrl }}"
-            echo "Package Repository: ${{ steps.get_package_info.outputs.PACKAGE_REPOSITORY }}"
+    runs-on: ubuntu-latest
+    strategy:
+      # Every package gets a job, but a release normally bumps only some of them. Without
+      # this, the first already-published package to be skipped or fail would cancel the
+      # jobs for the packages that do need publishing.
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.check-packages.outputs.matrix) }}
 
-        - name: Setup NodeJS
-          uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
-          with:
-            node-version-file: '.nvmrc'
-            cache: 'npm'
-            registry-url: https://registry.npmjs.org
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-    #   Install dependencies and build
-        - name: Install dependencies and build
-          run: |
-            npm ci
-            npm run build
+      - name: Process package
+        run: |
+          echo "Processing package: ${{ matrix.package }}"
 
-        - name: Pre upload validation
-          id: pack
-          run: |
-            cd ${{ matrix.package }}
-            npm pack --dry-run > output 2>&1
-            PRE_UPLOAD_HASH=$(grep 'shasum' output | awk '{print $NF}')
-            echo "PRE_UPLOAD_HASH=$PRE_UPLOAD_HASH" >> $GITHUB_OUTPUT
-            echo "PRE_UPLOAD_HASH: $PRE_UPLOAD_HASH"
-        
-        - name: Check if version is already published
-          id: version_check
-          run: |
-            PACKAGE_NAME=$(cat ${{ matrix.package }}/package.json | jq -r .name)
-            PACKAGE_VERSION=$(cat ${{ matrix.package }}/package.json | jq -r .version)
+      - name: Get package.json package name and match with repository name
+        id: get_package_info
+        run: |
+          echo PACKAGE_NAME=$(cat ${{ matrix.package }}/package.json | jq -r .name) >> $GITHUB_OUTPUT
+          echo PACKAGE_VERSION=$(cat ${{ matrix.package }}/package.json | jq -r .version) >> $GITHUB_OUTPUT
+          echo PACKAGE_REPOSITORY=$(cat ${{ matrix.package }}/package.json | jq -r .repository.url | sed 's/\+https//') >> $GITHUB_OUTPUT
 
-            # An `exit 0` here would only end this step -- the publish step would still run
-            # and fail with EPUBLISHCONFLICT. The decision has to be carried as an output.
-            if npm view $PACKAGE_NAME@$PACKAGE_VERSION > /dev/null 2>&1; then
-                echo "Version $PACKAGE_VERSION of $PACKAGE_NAME is already published."
-                echo "skip=true" >> $GITHUB_OUTPUT
-            else
-                echo "Version $PACKAGE_VERSION of $PACKAGE_NAME is not published. Proceeding with publishing..."
-                echo "skip=false" >> $GITHUB_OUTPUT
+      - name: Print outputs for debugging
+        run: |
+          echo "GitHub Repository: ${{ github.repository }}"
+          echo "Package Name: ${{ steps.get_package_info.outputs.PACKAGE_NAME }}"
+          echo "Github Tag: ${{ github.ref }}"
+          echo "Package Version: ${{ steps.get_package_info.outputs.PACKAGE_VERSION }}"
+          echo "GitHub Repository URL: ${{ github.repositoryUrl }}"
+          echo "Package Repository: ${{ steps.get_package_info.outputs.PACKAGE_REPOSITORY }}"
+
+      - name: Check if package repository matches with repository
+        if: github.repositoryUrl != steps.get_package_info.outputs.PACKAGE_REPOSITORY
+        # Fail if package repository doesn't match with repository
+        run: exit 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: https://registry.npmjs.org
+
+      - name: Update npm
+        # Trusted publishing requires a recent npm; the version bundled with the pinned
+        # node release predates it.
+        run: npm install -g npm@latest
+
+      - name: Clean install dependencies
+        run: |
+          rm -rf packages/*/dist
+          npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Pre upload validation
+        id: pack
+        run: |
+          cd ${{ matrix.package }}
+          rm -f *.tgz
+          PRE_UPLOAD_HASH=$(npm pack --dry-run 2>&1 | grep 'shasum:' | awk '{print $NF}')
+          echo "PRE_UPLOAD_HASH=$PRE_UPLOAD_HASH" >> $GITHUB_OUTPUT
+          echo "PRE_UPLOAD_HASH: $PRE_UPLOAD_HASH"
+
+      - name: Check if version is already published
+        id: version_check
+        run: |
+          PACKAGE_NAME=${{ steps.get_package_info.outputs.PACKAGE_NAME }}
+          PACKAGE_VERSION=${{ steps.get_package_info.outputs.PACKAGE_VERSION }}
+
+          # An `exit 0` here would only end this step -- the publish step would still run and
+          # fail with EPUBLISHCONFLICT. The decision has to be carried as an output.
+          if npm view $PACKAGE_NAME@$PACKAGE_VERSION > /dev/null 2>&1; then
+            echo "Version $PACKAGE_VERSION of $PACKAGE_NAME is already published."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $PACKAGE_VERSION of $PACKAGE_NAME is not published. Proceeding with publishing..."
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload package
+        if: steps.version_check.outputs.skip != 'true'
+        run: |
+          cd ${{ matrix.package }}
+          PACKAGE_VERSION=${{ steps.get_package_info.outputs.PACKAGE_VERSION }}
+
+          # npm tags every publish `latest` unless told otherwise, prerelease or not, so a
+          # prerelease would become what a plain `npm install` resolves to. Versions are
+          # independent per package here, so the tag comes from each package's own
+          # prerelease identifier rather than the release-level prerelease flag:
+          # 2.0.0-beta.0 -> beta, 1.0.5-alpha -> alpha, 3.1.4-rc.2 -> rc.
+          NPM_TAG=latest
+          if [ "$PACKAGE_VERSION" != "${PACKAGE_VERSION#*-}" ]; then
+            NPM_TAG=$(echo "${PACKAGE_VERSION#*-}" | cut -d. -f1)
+            # npm rejects a dist-tag that parses as a version, so an all-numeric
+            # identifier (1.0.0-1) needs a name instead.
+            if [ -z "$NPM_TAG" ] || [ -z "$(printf '%s' "$NPM_TAG" | tr -d '0-9')" ]; then
+              NPM_TAG=prerelease
             fi
+          fi
 
-        - name: Upload package
-          if: steps.version_check.outputs.skip != 'true'
-          run: |
-            cd ${{ matrix.package }}
-            PACKAGE_VERSION=$(jq -r .version package.json)
+          echo "Publishing $PACKAGE_VERSION with dist-tag: $NPM_TAG"
+          npm publish --access public --tag "$NPM_TAG"
 
-            # npm tags every publish `latest` unless told otherwise, prerelease or not, so a
-            # prerelease would otherwise become what a plain `npm install` resolves to. Take
-            # the dist-tag from the version's own prerelease identifier rather than assuming
-            # one: 2.0.0-beta.0 -> beta, 1.0.5-alpha -> alpha, 3.1.4-rc.2 -> rc.
-            NPM_TAG=latest
-            if [ "$PACKAGE_VERSION" != "${PACKAGE_VERSION#*-}" ]; then
-              NPM_TAG=$(echo "${PACKAGE_VERSION#*-}" | cut -d. -f1)
-              # npm rejects a dist-tag that parses as a version, so an all-numeric
-              # identifier (1.0.0-1) needs a name instead.
-              if [ -z "$NPM_TAG" ] || [ -z "$(printf '%s' "$NPM_TAG" | tr -d '0-9')" ]; then
-                NPM_TAG=prerelease
-              fi
-            fi
+      - name: Post upload validation
+        id: unpack
+        if: steps.version_check.outputs.skip != 'true'
+        run: |
+          FULL_PACKAGE_NAME="${{ steps.get_package_info.outputs.PACKAGE_NAME }}@${{ steps.get_package_info.outputs.PACKAGE_VERSION }}"
 
-            echo "Publishing $PACKAGE_VERSION with dist-tag: $NPM_TAG"
-            npm publish --access public --tag "$NPM_TAG"
-          env:
-            NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          # Wait for package propagation
+          echo "Waiting for package propagation..."
+          sleep 15
 
-        - name: Post upload validation
-          id: unpack
-          if: steps.version_check.outputs.skip != 'true'
-          run: |
-            # Get the package name and version
-            PACKAGE_NAME=$(cat ${{ matrix.package }}/package.json | jq -r .name)
-            PACKAGE_VERSION=$(cat ${{ matrix.package }}/package.json | jq -r .version)
-            FULL_PACKAGE_NAME="${PACKAGE_NAME}@${PACKAGE_VERSION}"
+          # Fetch the shasum from npm
+          POST_UPLOAD_HASH=$(npm view $FULL_PACKAGE_NAME dist.shasum)
+          echo "POST_UPLOAD_HASH=$POST_UPLOAD_HASH" >> $GITHUB_OUTPUT
+          echo "POST_UPLOAD_HASH: $POST_UPLOAD_HASH"
 
-            # Wait for package propagation
-            echo "Waiting for package propagation..."
-            sleep 15
+      - name: Pre and Post Upload validation
+        if: steps.version_check.outputs.skip != 'true'
+        run: |
+          echo "Comparing hashes..."
+          echo "PRE_UPLOAD_HASH: '${{ steps.pack.outputs.PRE_UPLOAD_HASH }}'"
+          echo "POST_UPLOAD_HASH: '${{ steps.unpack.outputs.POST_UPLOAD_HASH }}'"
 
-            # Fetch the shasum from npm
-            POST_UPLOAD_HASH=$(npm view $FULL_PACKAGE_NAME dist.shasum)
-            echo "POST_UPLOAD_HASH=$POST_UPLOAD_HASH" >> $GITHUB_OUTPUT
-            echo "POST_UPLOAD_HASH: $POST_UPLOAD_HASH"
-
-        - name: Pre and Post Upload validation
-          if: steps.version_check.outputs.skip != 'true'
-          run: |
-            echo "Comparing hashes..."
-            echo "PRE_UPLOAD_HASH: '${{ steps.pack.outputs.PRE_UPLOAD_HASH }}'"
-            echo "POST_UPLOAD_HASH: '${{ steps.unpack.outputs.POST_UPLOAD_HASH }}'"
-
-            if [ "${{ steps.pack.outputs.PRE_UPLOAD_HASH }}" != "${{ steps.unpack.outputs.POST_UPLOAD_HASH }}" ]; then
-                echo "Hash mismatch detected!"
-                exit 1
-            fi
-            echo "Hashes match successfully!"
+          if [ "${{ steps.pack.outputs.PRE_UPLOAD_HASH }}" != "${{ steps.unpack.outputs.POST_UPLOAD_HASH }}" ]; then
+            echo "Hash mismatch detected!"
+            exit 1
+          fi
+          echo "Hashes match successfully!"
